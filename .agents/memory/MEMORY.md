@@ -1,0 +1,1 @@
+- [School Hub architecture](school-hub-arch.md) — key decisions for the School Hub migration (uploads, admin auth, codegen quirks, routing)

@@ -6,6 +6,7 @@ import { randomUUID } from "crypto";
 import { db, submissionsTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import { isAdmin } from "./admin";
+import { uploadFile } from "../lib/storage";
 
 const router = Router();
 
@@ -189,7 +190,9 @@ router.post("/submissions", upload.single("file"), async (req, res) => {
   }
 
   const id = randomUUID();
-  const fileUrl = file ? `/api/uploads/${file.filename}` : "";
+  const fileUrl = file
+    ? await uploadFile(file.path, file.filename, file.mimetype)
+    : "";
 
   await db.insert(submissionsTable).values({
     id,

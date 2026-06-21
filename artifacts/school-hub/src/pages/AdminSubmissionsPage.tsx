@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
+import { apiUrl } from "../lib/api";
 
 type Submission = {
   id: string;
@@ -30,7 +31,7 @@ export default function AdminSubmissionsPage() {
   async function loadItems() {
     setLoading(true);
     setError("");
-    const res = await fetch("/api/submissions", { credentials: "include" });
+    const res = await fetch(apiUrl("/api/submissions"), { credentials: "include" });
     if (res.status === 401) { navigate("/admin/login"); return; }
     const data = await res.json();
     setItems(data.submissions || []);
@@ -40,7 +41,7 @@ export default function AdminSubmissionsPage() {
   useEffect(() => { loadItems(); }, []);
 
   async function updateStatus(id: string, status: Submission["status"]) {
-    const res = await fetch("/api/submissions", {
+    const res = await fetch(apiUrl("/api/submissions"), {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, status }),
@@ -56,7 +57,7 @@ export default function AdminSubmissionsPage() {
   }
 
   async function logout() {
-    await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+    await fetch(apiUrl("/api/admin/logout"), { method: "POST", credentials: "include" });
     navigate("/admin/login");
   }
 

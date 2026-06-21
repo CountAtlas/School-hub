@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { apiUrl } from "../lib/api";
 
 interface VivaQAPair {
   question: string;
@@ -71,7 +72,7 @@ export default function SubmitPage() {
         formData.append("vivaQA", JSON.stringify(filteredViva.map((v) => ({ question: v.question.trim(), answer: v.answer.trim() }))));
       }
 
-      const res = await fetch("/api/submissions", { method: "POST", body: formData });
+      const res = await fetch(apiUrl("/api/submissions"), { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Upload failed.");
 

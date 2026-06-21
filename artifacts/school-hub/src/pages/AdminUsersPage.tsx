@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link } from "wouter";
+import { apiUrl } from "../lib/api";
 
 type AdminUser = {
   id: string;
@@ -24,8 +25,8 @@ export default function AdminUsersPage() {
     setLoading(true);
     setError("");
     const [meRes, usersRes] = await Promise.all([
-      fetch("/api/admin/me", { credentials: "include" }),
-      fetch("/api/admin/users", { credentials: "include" }),
+      fetch(apiUrl("/api/admin/me"), { credentials: "include" }),
+      fetch(apiUrl("/api/admin/users"), { credentials: "include" }),
     ]);
     if (usersRes.status === 401) { navigate("/admin/login"); return; }
     const meData = await meRes.json().catch(() => null);
@@ -42,7 +43,7 @@ export default function AdminUsersPage() {
     setCreating(true);
     setCreateError("");
     setCreateSuccess("");
-    const res = await fetch("/api/admin/users", {
+    const res = await fetch(apiUrl("/api/admin/users"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: newName, password: newPassword }),
@@ -62,7 +63,7 @@ export default function AdminUsersPage() {
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Delete admin "${name}"? This cannot be undone.`)) return;
-    const res = await fetch(`/api/admin/users/${id}`, {
+    const res = await fetch(apiUrl(`/api/admin/users/${id}`), {
       method: "DELETE",
       credentials: "include",
     });

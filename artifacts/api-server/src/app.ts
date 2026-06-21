@@ -27,8 +27,11 @@ app.use(
     },
   }),
 );
+const allowedOrigin = process.env.ALLOWED_ORIGIN;
 app.use(cors({
-  origin: true,
+  origin: allowedOrigin
+    ? allowedOrigin.split(",").map((o) => o.trim())
+    : true,
   credentials: true,
   exposedHeaders: ["Content-Range", "Accept-Ranges", "Content-Length"],
 }));

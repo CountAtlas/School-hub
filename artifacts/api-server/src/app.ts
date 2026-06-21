@@ -2,27 +2,27 @@ import express, { type Express } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 import cookieParser from "cookie-parser";
+import session from "express-session";
 import path from "path";
 import router from "./routes";
 import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET) {
+  throw new Error("SESSION_SECRET environment variable is required");
+}
+
 app.use(
   pinoHttp({
     logger,
     serializers: {
       req(req) {
-        return {
-          id: req.id,
-          method: req.method,
-          url: req.url?.split("?")[0],
-        };
+        return { id: req.id, method: req.method, url: req.url?.split("?")[0] };
       },
       res(res) {
-        return {
-          statusCode: res.statusCode,
-        };
+        return { statusCode: res.statusCode };
       },
     },
   }),
@@ -32,11 +32,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads");
-app.use("/api/uploads", express.static(UPLOAD_DIR));
+app.use(
+  session({
+    name: "sid",
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
+  }),
+);
 
+const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const BACKUP_UPLOADS = path.join(process.cwd(), "public-uploads");
-app.use("/api/uploads", express.static(BACKUP_UPLOADS));
+
+function safeStaticMiddleware(dir: string) {
+  const staticMiddleware = express.static(dir, {
+    setHeaders(res) {
+      res.setHeader("Content-Disposition", "attachment");
+      res.setHeader("X-Content-Type-Options", "nosniff");
+    },
+  });
+  return staticMiddleware;
+}
+
+app.use("/api/uploads", safeStaticMiddleware(UPLOAD_DIR));
+app.use("/api/uploads", safeStaticMiddleware(BACKUP_UPLOADS));
 
 app.use("/api", router);
 

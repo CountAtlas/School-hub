@@ -1,11 +1,12 @@
 import { Router } from "express";
+import type { Request } from "express";
 
 const router = Router();
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
-function isAdmin(req: any): boolean {
-  return req.cookies?.["admin-auth"] === "true";
+export function isAdmin(req: Request): boolean {
+  return (req.session as any)?.adminAuthenticated === true;
 }
 
 // POST /api/admin/login
@@ -23,31 +24,34 @@ router.post("/admin/login", async (req, res) => {
     return;
   }
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict" as const,
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7 * 1000,
-  };
+  (req.session as any).adminAuthenticated = true;
+  (req.session as any).adminName = adminName;
 
-  res.cookie("admin-auth", "true", cookieOptions);
-  res.cookie("admin-name", adminName, cookieOptions);
-  res.json({ ok: true, name: adminName });
+  req.session.save((err) => {
+    if (err) {
+      res.status(500).json({ error: "Session error." });
+      return;
+    }
+    res.json({ ok: true, name: adminName });
+  });
 });
 
 // POST /api/admin/logout
-router.post("/admin/logout", (_req, res) => {
-  const clear = { httpOnly: true, path: "/", maxAge: 0 };
-  res.clearCookie("admin-auth", clear);
-  res.clearCookie("admin-name", clear);
-  res.json({ ok: true });
+router.post("/admin/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ error: "Logout error." });
+      return;
+    }
+    res.clearCookie("sid");
+    res.json({ ok: true });
+  });
 });
 
 // GET /api/admin/me
 router.get("/admin/me", (req, res) => {
   const authenticated = isAdmin(req);
-  const name = req.cookies?.["admin-name"] || null;
+  const name = (req.session as any)?.adminName || null;
   res.json({ authenticated, name });
 });
 

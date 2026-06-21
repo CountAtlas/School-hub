@@ -5,11 +5,34 @@ import fs from "fs";
 import { randomUUID } from "crypto";
 import { db, submissionsTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
+import { isAdmin } from "./admin";
 
 const router = Router();
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "text/plain",
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/x-python-code",
+  "text/x-python",
+]);
+
+const ALLOWED_EXTENSIONS = new Set([
+  ".pdf",
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".txt",
+  ".py",
+  ".zip",
+]);
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
@@ -19,11 +42,19 @@ const storage = multer.diskStorage({
     cb(null, `${base}-${randomUUID()}${ext}`);
   },
 });
-const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 } });
 
-function isAdmin(req: any): boolean {
-  return req.cookies?.["admin-auth"] === "true";
-}
+const upload = multer({
+  storage,
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter(_req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.has(ext) || !ALLOWED_MIME_TYPES.has(file.mimetype)) {
+      cb(new Error(`File type not allowed: ${file.mimetype}`));
+      return;
+    }
+    cb(null, true);
+  },
+});
 
 function submissionToApi(s: any) {
   return {
@@ -65,9 +96,10 @@ router.get("/submissions/approved", async (req, res) => {
   const section = req.query.section as string | undefined;
   let rows;
   if (section) {
-    rows = await db.select().from(submissionsTable).where(
-      and(eq(submissionsTable.status, "approved"), eq(submissionsTable.section, section))
-    );
+    rows = await db
+      .select()
+      .from(submissionsTable)
+      .where(and(eq(submissionsTable.status, "approved"), eq(submissionsTable.section, section)));
   } else {
     rows = await db.select().from(submissionsTable).where(eq(submissionsTable.status, "approved"));
   }
@@ -95,7 +127,7 @@ router.get("/submissions/stats", async (req, res) => {
   });
 });
 
-// POST /api/submissions — public, create submission
+// POST /api/submissions — public, create submission with file upload
 router.post("/submissions", upload.single("file"), async (req, res) => {
   const { title, subject, classLevel, section, board, author, description } = req.body;
   const file = req.file;
@@ -152,7 +184,7 @@ router.patch("/submissions", async (req, res) => {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
-  const adminName = req.cookies?.["admin-name"]?.trim() || "Admin";
+  const adminName = (req.session as any)?.adminName?.trim() || "Admin";
   const { id, status } = req.body;
 
   if (!id || !status) {

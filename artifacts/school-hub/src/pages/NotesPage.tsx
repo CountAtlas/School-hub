@@ -1,7 +1,7 @@
-"use client";
 import { useMemo, useState } from "react";
 import { useGetApprovedSubmissions } from "@workspace/api-client-react";
 import { useSearch } from "wouter";
+import PdfThumbnail from "../components/PdfThumbnail";
 
 async function trackMetric(id: string, metric: "views" | "downloads"): Promise<void> {
   const url = `/api/submissions/${encodeURIComponent(id)}/engagement`;
@@ -139,9 +139,11 @@ export default function NotesPage() {
                     {note.board && <span className="rounded-full border border-zinc-700 px-2 py-1 text-[10px] text-zinc-300">{note.board}</span>}
                   </div>
 
-                  {note.description && (
+                  {note.mimeType === "application/pdf" ? (
+                    <PdfThumbnail url={note.fileUrl} className="mt-3 h-44" />
+                  ) : note.description ? (
                     <p className="mt-3 text-sm text-zinc-400 line-clamp-3">{note.description}</p>
-                  )}
+                  ) : null}
 
                   <div className="mt-auto pt-3">
                     <div className="flex items-center justify-between text-xs text-zinc-500">

@@ -1,1 +1,1 @@
-- [School Hub architecture](school-hub-arch.md) — key decisions for the School Hub migration (uploads, admin auth, codegen quirks, routing)
+- [pdfjs-dist setup](pdfjs-worker-setup.md) — v3.11.174 + worker copied to public/ + workerSrc = BASE_URL + "pdf.worker.min.js"; pass { url, withCredentials: true } to getDocument

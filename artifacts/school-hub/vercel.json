@@ -1,6 +1,6 @@
 {
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
-  "buildCommand": "pnpm --filter @workspace/school-hub run build",
-  "outputDirectory": "artifacts/school-hub/dist/public",
-  "installCommand": "pnpm install"
+  "buildCommand": "cd ../.. && pnpm --filter @workspace/school-hub run build",
+  "outputDirectory": "dist/public",
+  "installCommand": "cd ../.. && pnpm install"
 }

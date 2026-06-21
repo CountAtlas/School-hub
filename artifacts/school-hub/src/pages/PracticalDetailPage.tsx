@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useParams } from "wouter";
 import { Link } from "wouter";
 import { useGetSubmissionById } from "@workspace/api-client-react";
+import { apiUrl } from "../lib/api";
 
 async function trackView(id: string): Promise<void> {
   try {
@@ -10,7 +11,7 @@ async function trackView(id: string): Promise<void> {
     localStorage.setItem(key, "1");
   } catch {}
   try {
-    await fetch(`/api/submissions/${encodeURIComponent(id)}/engagement`, {
+    await fetch(apiUrl(`/api/submissions/${encodeURIComponent(id)}/engagement`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ metric: "views" }),

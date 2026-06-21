@@ -6,7 +6,7 @@ import { randomUUID } from "crypto";
 import { db, submissionsTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import { isAdmin } from "./admin";
-import { uploadFile } from "../lib/storage";
+import { uploadFile, deleteFile } from "../lib/storage";
 
 const router = Router();
 
@@ -254,12 +254,19 @@ router.patch("/submissions", async (req, res) => {
     updateData.approvedAt = null;
   }
 
-  await db.update(submissionsTable).set(updateData).where(eq(submissionsTable.id, id));
-  const rows = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));
-  if (rows.length === 0) {
+  const before = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));
+  if (before.length === 0) {
     res.status(404).json({ error: "Submission not found." });
     return;
   }
+
+  await db.update(submissionsTable).set(updateData).where(eq(submissionsTable.id, id));
+
+  if (status === "rejected" && before[0].fileUrl) {
+    deleteFile(before[0].fileUrl).catch(() => {});
+  }
+
+  const rows = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));
   res.json({ ok: true, submission: submissionToApi(rows[0]) });
 });
 

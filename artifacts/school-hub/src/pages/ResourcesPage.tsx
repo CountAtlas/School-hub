@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import { useGetApprovedSubmissions } from "@workspace/api-client-react";
 import PdfThumbnail from "../components/PdfThumbnail";
+import { apiUrl } from "../lib/api";
 
 async function trackMetric(id: string, metric: "views" | "downloads"): Promise<void> {
-  const url = `/api/submissions/${encodeURIComponent(id)}/engagement`;
+  const url = apiUrl(`/api/submissions/${encodeURIComponent(id)}/engagement`);
   try {
     if (typeof window !== "undefined") {
       const key = `${metric}-${id}`;

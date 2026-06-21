@@ -1,0 +1,180 @@
+"use client";
+import { useMemo, useState } from "react";
+import { useGetApprovedSubmissions } from "@workspace/api-client-react";
+import { useSearch } from "wouter";
+
+async function trackMetric(id: string, metric: "views" | "downloads"): Promise<void> {
+  const url = `/api/submissions/${encodeURIComponent(id)}/engagement`;
+  try {
+    if (typeof window !== "undefined") {
+      const key = `${metric}-${id}`;
+      if (localStorage.getItem(key)) return;
+      localStorage.setItem(key, "1");
+    }
+  } catch {}
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metric }),
+      credentials: "include",
+      keepalive: true,
+    });
+  } catch {}
+}
+
+export default function NotesPage() {
+  const search = useSearch();
+  const params = new URLSearchParams(search);
+  const initialSubject = params.get("subject") || "All";
+
+  const { data } = useGetApprovedSubmissions({ section: "notes" });
+  const notes = data?.submissions ?? [];
+
+  const [query, setQuery] = useState("");
+  const [activeSubject, setActiveSubject] = useState(initialSubject);
+  const [activeAuthor, setActiveAuthor] = useState("All");
+  const [actionError, setActionError] = useState("");
+
+  const subjects = useMemo(() => [
+    "All",
+    ...Array.from(new Set(notes.map((n) => n.subject))).filter(Boolean),
+  ], [notes]);
+
+  const authors = useMemo(() => [
+    "All",
+    ...Array.from(new Set(notes.map((n) => n.author).filter(Boolean))),
+  ], [notes]);
+
+  const filtered = useMemo(() => {
+    const s = query.toLowerCase().trim();
+    return notes.filter((note) => {
+      const matchSearch = !s ||
+        note.title.toLowerCase().includes(s) ||
+        note.subject.toLowerCase().includes(s) ||
+        (note.author || "").toLowerCase().includes(s);
+      const matchSubject = activeSubject === "All" || note.subject === activeSubject;
+      const matchAuthor = activeAuthor === "All" || note.author === activeAuthor;
+      return matchSearch && matchSubject && matchAuthor;
+    });
+  }, [notes, query, activeSubject, activeAuthor]);
+
+  async function openPdf(note: (typeof notes)[0]) {
+    setActionError("");
+    try { await trackMetric(note.id, "views"); } catch {}
+    try { window.location.assign(note.fileUrl); } catch { setActionError("Could not open the file."); }
+  }
+
+  async function downloadPdf(note: (typeof notes)[0]) {
+    setActionError("");
+    try { await trackMetric(note.id, "downloads"); } catch {}
+    try {
+      const link = document.createElement("a");
+      link.href = note.fileUrl;
+      link.download = note.fileUrl.split("/").pop() || "download";
+      link.rel = "noreferrer noopener";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch { setActionError("Could not start the download."); }
+  }
+
+  return (
+    <main className="min-h-screen px-6 py-10 text-white">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10">
+          <p className="text-sm uppercase tracking-[0.4em] text-violet-400">School Hub</p>
+          <h1 className="mt-3 text-5xl font-bold">Notes</h1>
+          <p className="mt-3 text-zinc-400">Study material, revision notes, and practical PDFs in one place.</p>
+        </div>
+
+        <div className="mb-6 grid gap-4 md:grid-cols-3">
+          <input
+            type="text"
+            placeholder="Search notes, authors, subjects..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 outline-none focus:border-violet-500"
+          />
+          <select
+            value={activeSubject}
+            onChange={(e) => setActiveSubject(e.target.value)}
+            className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 outline-none focus:border-violet-500"
+          >
+            {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select
+            value={activeAuthor}
+            onChange={(e) => setActiveAuthor(e.target.value)}
+            className="rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 outline-none focus:border-violet-500"
+          >
+            {authors.map((a) => <option key={String(a)} value={String(a)}>{String(a)}</option>)}
+          </select>
+        </div>
+
+        {actionError && (
+          <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {actionError}
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-center gap-6">
+          {filtered.length > 0 ? (
+            filtered.map((note) => (
+              <article
+                key={note.id}
+                className="group block w-[300px] min-h-[20rem] overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]"
+              >
+                <div className="flex h-full flex-col">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-xl font-semibold text-white">{note.title}</h2>
+                      <p className="mt-1 text-sm text-zinc-400">By {note.author || "Anonymous"}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-violet-500/15 px-3 py-1 text-[10px] text-violet-300">{note.subject}</span>
+                    <span className="rounded-full border border-zinc-700 px-2 py-1 text-[10px] text-zinc-300">Class {note.classLevel}</span>
+                    {note.board && <span className="rounded-full border border-zinc-700 px-2 py-1 text-[10px] text-zinc-300">{note.board}</span>}
+                  </div>
+
+                  {note.description && (
+                    <p className="mt-3 text-sm text-zinc-400 line-clamp-3">{note.description}</p>
+                  )}
+
+                  <div className="mt-auto pt-3">
+                    <div className="flex items-center justify-between text-xs text-zinc-500">
+                      <span>{note.views ?? 0} views</span>
+                      <span>{note.downloads ?? 0} downloads</span>
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => openPdf(note)}
+                        className="flex-1 rounded-xl border border-violet-500/30 bg-violet-500/10 px-3 py-2 text-xs text-violet-300 transition hover:bg-violet-500/20"
+                      >
+                        View PDF
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => downloadPdf(note)}
+                        className="flex-1 rounded-xl border border-zinc-700 px-3 py-2 text-xs text-zinc-300 transition hover:border-violet-500"
+                      >
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))
+          ) : (
+            <div className="rounded-3xl border border-zinc-800 bg-zinc-950 p-8 text-zinc-400">
+              No notes found.
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}

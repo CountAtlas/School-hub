@@ -1,15 +1,18 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: School Hub API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: submissions
+    description: Submission operations
+  - name: admin
+    description: Admin operations
 paths:
   /healthz:
     get:
@@ -24,6 +27,220 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /submissions:
+    get:
+      operationId: getSubmissions
+      tags: [submissions]
+      summary: Get all submissions (admin only)
+      responses:
+        "200":
+          description: List of all submissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Submission"
+                required:
+                  - submissions
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createSubmission
+      tags: [submissions]
+      summary: Submit a new file (public)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SubmissionInput"
+      responses:
+        "200":
+          description: Submission created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  submission:
+                    $ref: "#/components/schemas/Submission"
+                required:
+                  - ok
+        "400":
+          description: Bad request
+    patch:
+      operationId: updateSubmissionStatus
+      tags: [submissions]
+      summary: Update submission status (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmissionStatusUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  submission:
+                    $ref: "#/components/schemas/Submission"
+                required:
+                  - ok
+        "401":
+          description: Unauthorized
+
+  /submissions/approved:
+    get:
+      operationId: getApprovedSubmissions
+      tags: [submissions]
+      summary: Get approved submissions by section
+      parameters:
+        - name: section
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [notes, practicals, resources]
+      responses:
+        "200":
+          description: Approved submissions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Submission"
+                required:
+                  - submissions
+
+  /submissions/stats:
+    get:
+      operationId: getStats
+      tags: [submissions]
+      summary: Get site statistics
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
+  /submissions/{id}/engagement:
+    post:
+      operationId: trackEngagement
+      tags: [submissions]
+      summary: Track view or download
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EngagementInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                required:
+                  - ok
+        "404":
+          description: Not found
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  name:
+                    type: string
+                required:
+                  - ok
+        "401":
+          description: Unauthorized
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                required:
+                  - ok
+
+  /admin/me:
+    get:
+      operationId: adminMe
+      tags: [admin]
+      summary: Get current admin session info
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authenticated:
+                    type: boolean
+                  name:
+                    type: ["string", "null"]
+                required:
+                  - authenticated
+                  - name
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +251,137 @@ components:
       required:
         - status
 
+    Submission:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        subject:
+          type: string
+        board:
+          type: ["string", "null"]
+        classLevel:
+          type: string
+        section:
+          type: string
+        author:
+          type: ["string", "null"]
+        description:
+          type: ["string", "null"]
+        originalFileName:
+          type: string
+        storedFileName:
+          type: string
+        fileUrl:
+          type: string
+        mimeType:
+          type: string
+        status:
+          type: string
+        views:
+          type: ["integer", "null"]
+        downloads:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+        approvedBy:
+          type: ["string", "null"]
+        approvedAt:
+          type: ["string", "null"]
+        rejectedBy:
+          type: ["string", "null"]
+        rejectedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - title
+        - subject
+        - classLevel
+        - section
+        - originalFileName
+        - storedFileName
+        - fileUrl
+        - mimeType
+        - status
+        - createdAt
+
+    SubmissionInput:
+      type: object
+      properties:
+        title:
+          type: string
+        subject:
+          type: string
+        board:
+          type: string
+        classLevel:
+          type: string
+        section:
+          type: string
+        author:
+          type: string
+        description:
+          type: string
+      required:
+        - title
+        - subject
+        - classLevel
+        - section
+
+    SubmissionStatusUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+      required:
+        - id
+        - status
+
+    EngagementInput:
+      type: object
+      properties:
+        metric:
+          type: string
+          enum: [views, downloads]
+      required:
+        - metric
+
+    AdminLoginInput:
+      type: object
+      properties:
+        name:
+          type: string
+        password:
+          type: string
+      required:
+        - password
+
+    Stats:
+      type: object
+      properties:
+        approvedCount:
+          type: integer
+        pendingCount:
+          type: integer
+        notesCount:
+          type: integer
+        practicalsCount:
+          type: integer
+        resourcesCount:
+          type: integer
+        contributors:
+          type: integer
+        subjectsCount:
+          type: integer
+      required:
+        - approvedCount
+        - pendingCount
+        - notesCount
+        - practicalsCount
+        - resourcesCount
+        - contributors
+        - subjectsCount

@@ -10,6 +10,11 @@ import { isSupabaseConfigured } from "./lib/storage";
 
 const app: Express = express();
 
+// Trust first proxy (Railway/Render/Vercel) so secure session cookies work behind TLS termination.
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
+
 const SESSION_SECRET = process.env.SESSION_SECRET;
 if (!SESSION_SECRET) {
   throw new Error("SESSION_SECRET environment variable is required");

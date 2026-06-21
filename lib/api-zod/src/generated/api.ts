@@ -41,7 +41,15 @@ export const GetSubmissionsResponse = zod.object({
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
-  "rejectedAt": zod.string().nullish()
+  "rejectedAt": zod.string().nullish(),
+  "practicalNo": zod.string().nullish(),
+  "aim": zod.string().nullish(),
+  "algorithm": zod.string().nullish(),
+  "code": zod.string().nullish(),
+  "expectedOutput": zod.string().nullish(),
+  "commonErrors": zod.string().nullish(),
+  "vivaQA": zod.string().nullish(),
+  "tags": zod.string().nullish()
 }))
 })
 
@@ -56,7 +64,15 @@ export const CreateSubmissionBody = zod.object({
   "classLevel": zod.string(),
   "section": zod.string(),
   "author": zod.string().optional(),
-  "description": zod.string().optional()
+  "description": zod.string().optional(),
+  "practicalNo": zod.string().optional(),
+  "aim": zod.string().optional(),
+  "algorithm": zod.string().optional(),
+  "code": zod.string().optional(),
+  "expectedOutput": zod.string().optional(),
+  "commonErrors": zod.string().optional(),
+  "vivaQA": zod.string().optional(),
+  "tags": zod.string().optional()
 })
 
 export const CreateSubmissionResponse = zod.object({
@@ -81,7 +97,15 @@ export const CreateSubmissionResponse = zod.object({
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
-  "rejectedAt": zod.string().nullish()
+  "rejectedAt": zod.string().nullish(),
+  "practicalNo": zod.string().nullish(),
+  "aim": zod.string().nullish(),
+  "algorithm": zod.string().nullish(),
+  "code": zod.string().nullish(),
+  "expectedOutput": zod.string().nullish(),
+  "commonErrors": zod.string().nullish(),
+  "vivaQA": zod.string().nullish(),
+  "tags": zod.string().nullish()
 }).optional()
 })
 
@@ -116,7 +140,15 @@ export const UpdateSubmissionStatusResponse = zod.object({
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
-  "rejectedAt": zod.string().nullish()
+  "rejectedAt": zod.string().nullish(),
+  "practicalNo": zod.string().nullish(),
+  "aim": zod.string().nullish(),
+  "algorithm": zod.string().nullish(),
+  "code": zod.string().nullish(),
+  "expectedOutput": zod.string().nullish(),
+  "commonErrors": zod.string().nullish(),
+  "vivaQA": zod.string().nullish(),
+  "tags": zod.string().nullish()
 }).optional()
 })
 
@@ -149,7 +181,15 @@ export const GetApprovedSubmissionsResponse = zod.object({
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
-  "rejectedAt": zod.string().nullish()
+  "rejectedAt": zod.string().nullish(),
+  "practicalNo": zod.string().nullish(),
+  "aim": zod.string().nullish(),
+  "algorithm": zod.string().nullish(),
+  "code": zod.string().nullish(),
+  "expectedOutput": zod.string().nullish(),
+  "commonErrors": zod.string().nullish(),
+  "vivaQA": zod.string().nullish(),
+  "tags": zod.string().nullish()
 }))
 })
 
@@ -165,6 +205,47 @@ export const GetStatsResponse = zod.object({
   "resourcesCount": zod.number(),
   "contributors": zod.number(),
   "subjectsCount": zod.number()
+})
+
+
+/**
+ * @summary Get a single submission by ID (public)
+ */
+export const GetSubmissionByIdParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const GetSubmissionByIdResponse = zod.object({
+  "submission": zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "subject": zod.string(),
+  "board": zod.string().nullish(),
+  "classLevel": zod.string(),
+  "section": zod.string(),
+  "author": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "originalFileName": zod.string(),
+  "storedFileName": zod.string(),
+  "fileUrl": zod.string(),
+  "mimeType": zod.string(),
+  "status": zod.string(),
+  "views": zod.number().nullish(),
+  "downloads": zod.number().nullish(),
+  "createdAt": zod.string(),
+  "approvedBy": zod.string().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "rejectedBy": zod.string().nullish(),
+  "rejectedAt": zod.string().nullish(),
+  "practicalNo": zod.string().nullish(),
+  "aim": zod.string().nullish(),
+  "algorithm": zod.string().nullish(),
+  "code": zod.string().nullish(),
+  "expectedOutput": zod.string().nullish(),
+  "commonErrors": zod.string().nullish(),
+  "vivaQA": zod.string().nullish(),
+  "tags": zod.string().nullish()
+})
 })
 
 

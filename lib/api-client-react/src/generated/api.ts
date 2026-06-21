@@ -28,6 +28,7 @@ import type {
   EngagementInput,
   GetApprovedSubmissions200,
   GetApprovedSubmissionsParams,
+  GetSubmissionById200,
   GetSubmissions200,
   HealthStatus,
   Stats,
@@ -229,6 +230,30 @@ if(submissionInput.author !== undefined) {
  }
 if(submissionInput.description !== undefined) {
  formData.append(`description`, submissionInput.description);
+ }
+if(submissionInput.practicalNo !== undefined) {
+ formData.append(`practicalNo`, submissionInput.practicalNo);
+ }
+if(submissionInput.aim !== undefined) {
+ formData.append(`aim`, submissionInput.aim);
+ }
+if(submissionInput.algorithm !== undefined) {
+ formData.append(`algorithm`, submissionInput.algorithm);
+ }
+if(submissionInput.code !== undefined) {
+ formData.append(`code`, submissionInput.code);
+ }
+if(submissionInput.expectedOutput !== undefined) {
+ formData.append(`expectedOutput`, submissionInput.expectedOutput);
+ }
+if(submissionInput.commonErrors !== undefined) {
+ formData.append(`commonErrors`, submissionInput.commonErrors);
+ }
+if(submissionInput.vivaQA !== undefined) {
+ formData.append(`vivaQA`, submissionInput.vivaQA);
+ }
+if(submissionInput.tags !== undefined) {
+ formData.append(`tags`, submissionInput.tags);
  }
 
   return customFetch<CreateSubmission200>(getCreateSubmissionUrl(),
@@ -509,6 +534,83 @@ export function useGetStats<TData = Awaited<ReturnType<typeof getStats>>, TError
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetSubmissionByIdUrl = (id: string,) => {
+
+
+
+
+  return `/api/submissions/${id}`
+}
+
+/**
+ * @summary Get a single submission by ID (public)
+ */
+export const getSubmissionById = async (id: string, options?: RequestInit): Promise<GetSubmissionById200> => {
+
+  return customFetch<GetSubmissionById200>(getGetSubmissionByIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSubmissionByIdQueryKey = (id: string,) => {
+    return [
+    `/api/submissions/${id}`
+    ] as const;
+    }
+
+
+export const getGetSubmissionByIdQueryOptions = <TData = Awaited<ReturnType<typeof getSubmissionById>>, TError = ErrorType<void>>(id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubmissionById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSubmissionByIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubmissionById>>> = ({ signal }) => getSubmissionById(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSubmissionById>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSubmissionByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getSubmissionById>>>
+export type GetSubmissionByIdQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get a single submission by ID (public)
+ */
+
+export function useGetSubmissionById<TData = Awaited<ReturnType<typeof getSubmissionById>>, TError = ErrorType<void>>(
+ id: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubmissionById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSubmissionByIdQueryOptions(id,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

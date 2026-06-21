@@ -14,4 +14,12 @@ export interface SubmissionInput {
   section: string;
   author?: string;
   description?: string;
+  practicalNo?: string;
+  aim?: string;
+  algorithm?: string;
+  code?: string;
+  expectedOutput?: string;
+  commonErrors?: string;
+  vivaQA?: string;
+  tags?: string;
 }

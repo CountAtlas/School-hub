@@ -66,10 +66,10 @@ function submissionToApi(s: any) {
     section: s.section,
     author: s.author ?? null,
     description: s.description ?? null,
-    originalFileName: s.originalFileName,
-    storedFileName: s.storedFileName,
-    fileUrl: s.fileUrl,
-    mimeType: s.mimeType,
+    originalFileName: s.originalFileName ?? "",
+    storedFileName: s.storedFileName ?? "",
+    fileUrl: s.fileUrl ?? "",
+    mimeType: s.mimeType ?? "",
     status: s.status,
     views: s.views ?? 0,
     downloads: s.downloads ?? 0,
@@ -78,6 +78,14 @@ function submissionToApi(s: any) {
     approvedAt: s.approvedAt ?? null,
     rejectedBy: s.rejectedBy ?? null,
     rejectedAt: s.rejectedAt ?? null,
+    practicalNo: s.practicalNo ?? null,
+    aim: s.aim ?? null,
+    algorithm: s.algorithm ?? null,
+    code: s.code ?? null,
+    expectedOutput: s.expectedOutput ?? null,
+    commonErrors: s.commonErrors ?? null,
+    vivaQA: s.vivaQA ?? null,
+    tags: s.tags ?? null,
   };
 }
 
@@ -127,13 +135,38 @@ router.get("/submissions/stats", async (req, res) => {
   });
 });
 
-// POST /api/submissions — public, create submission with file upload
+// GET /api/submissions/:id — public, single submission by ID
+router.get("/submissions/:id", async (req, res) => {
+  const { id } = req.params;
+  // Don't handle sub-paths here
+  if (id === "approved" || id === "stats") {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const rows = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));
+  if (rows.length === 0) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  res.json({ submission: submissionToApi(rows[0]) });
+});
+
+// POST /api/submissions — public, create submission with optional file upload
 router.post("/submissions", upload.single("file"), async (req, res) => {
-  const { title, subject, classLevel, section, board, author, description } = req.body;
+  const {
+    title, subject, classLevel, section, board, author, description,
+    practicalNo, aim, algorithm, code, expectedOutput, commonErrors, vivaQA, tags,
+  } = req.body;
   const file = req.file;
 
-  if (!title || !subject || !classLevel || !section || !file) {
+  if (!title || !subject || !classLevel || !section) {
     res.status(400).json({ error: "Missing required fields." });
+    return;
+  }
+
+  // File is required for notes and resources, optional for practicals
+  if (section !== "practicals" && !file) {
+    res.status(400).json({ error: "A file is required for notes and resources." });
     return;
   }
 
@@ -156,7 +189,7 @@ router.post("/submissions", upload.single("file"), async (req, res) => {
   }
 
   const id = randomUUID();
-  const fileUrl = `/api/uploads/${file.filename}`;
+  const fileUrl = file ? `/api/uploads/${file.filename}` : "";
 
   await db.insert(submissionsTable).values({
     id,
@@ -167,11 +200,19 @@ router.post("/submissions", upload.single("file"), async (req, res) => {
     section,
     author: author?.trim() || null,
     description: description?.trim() || null,
-    originalFileName: file.originalname,
-    storedFileName: file.filename,
+    originalFileName: file?.originalname ?? "",
+    storedFileName: file?.filename ?? "",
     fileUrl,
-    mimeType: file.mimetype || "application/octet-stream",
+    mimeType: file?.mimetype ?? "text/plain",
     status: "pending",
+    practicalNo: practicalNo?.trim() || null,
+    aim: aim?.trim() || null,
+    algorithm: algorithm?.trim() || null,
+    code: code?.trim() || null,
+    expectedOutput: expectedOutput?.trim() || null,
+    commonErrors: commonErrors?.trim() || null,
+    vivaQA: vivaQA?.trim() || null,
+    tags: tags?.trim() || null,
   });
 
   const rows = await db.select().from(submissionsTable).where(eq(submissionsTable.id, id));

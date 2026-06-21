@@ -16,6 +16,7 @@ export * from './engagementInputMetric';
 export * from './getApprovedSubmissions200';
 export * from './getApprovedSubmissionsParams';
 export * from './getApprovedSubmissionsSection';
+export * from './getSubmissionById200';
 export * from './getSubmissions200';
 export * from './healthStatus';
 export * from './stats';

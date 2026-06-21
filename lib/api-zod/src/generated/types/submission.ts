@@ -36,4 +36,20 @@ export interface Submission {
   rejectedBy?: string | null;
   /** @nullable */
   rejectedAt?: string | null;
+  /** @nullable */
+  practicalNo?: string | null;
+  /** @nullable */
+  aim?: string | null;
+  /** @nullable */
+  algorithm?: string | null;
+  /** @nullable */
+  code?: string | null;
+  /** @nullable */
+  expectedOutput?: string | null;
+  /** @nullable */
+  commonErrors?: string | null;
+  /** @nullable */
+  vivaQA?: string | null;
+  /** @nullable */
+  tags?: string | null;
 }

@@ -39,6 +39,22 @@ export interface Submission {
   rejectedBy?: string | null;
   /** @nullable */
   rejectedAt?: string | null;
+  /** @nullable */
+  practicalNo?: string | null;
+  /** @nullable */
+  aim?: string | null;
+  /** @nullable */
+  algorithm?: string | null;
+  /** @nullable */
+  code?: string | null;
+  /** @nullable */
+  expectedOutput?: string | null;
+  /** @nullable */
+  commonErrors?: string | null;
+  /** @nullable */
+  vivaQA?: string | null;
+  /** @nullable */
+  tags?: string | null;
 }
 
 export interface SubmissionInput {
@@ -49,6 +65,14 @@ export interface SubmissionInput {
   section: string;
   author?: string;
   description?: string;
+  practicalNo?: string;
+  aim?: string;
+  algorithm?: string;
+  code?: string;
+  expectedOutput?: string;
+  commonErrors?: string;
+  vivaQA?: string;
+  tags?: string;
 }
 
 export interface SubmissionStatusUpdate {
@@ -112,6 +136,10 @@ export const GetApprovedSubmissionsSection = {
 
 export type GetApprovedSubmissions200 = {
   submissions: Submission[];
+};
+
+export type GetSubmissionById200 = {
+  submission: Submission;
 };
 
 export type TrackEngagement200 = {

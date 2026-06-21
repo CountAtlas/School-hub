@@ -1,6 +1,5 @@
 import { Link } from "wouter";
 import { useGetStats, useGetApprovedSubmissions } from "@workspace/api-client-react";
-import { practicals } from "../data/practicals";
 
 const FEATURES = [
   {
@@ -45,27 +44,22 @@ const FEATURES = [
   },
 ];
 
-const SUBJECTS = [
-  "Computer Science",
-  "Accounts",
-  "Mathematics",
-  "Physics",
-  "Chemistry",
-  "English",
-];
-
 export default function AboutPage() {
   const { data: statsData } = useGetStats();
   const { data: approvedData } = useGetApprovedSubmissions();
 
   const approved = approvedData?.submissions ?? [];
-  const totalViews = approved.reduce((s, i) => s + (i.views ?? 0), 0)
-    + practicals.reduce((s, p) => s + p.views, 0);
+
+  const subjects = Array.from(
+    new Set(approved.map((item) => item.subject?.trim()).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b)) as string[];
+
+  const totalViews = approved.reduce((s, i) => s + (i.views ?? 0), 0);
 
   const stats = [
     { value: statsData?.notesCount ?? 0, label: "Notes" },
     { value: statsData?.resourcesCount ?? 0, label: "Resources" },
-    { value: practicals.length, label: "Practicals" },
+    { value: statsData?.practicalsCount ?? 0, label: "Practicals" },
     { value: statsData?.contributors ?? 0, label: "Contributors" },
     { value: statsData?.subjectsCount ?? 0, label: "Subjects" },
     { value: totalViews, label: "Total Views" },
@@ -139,19 +133,23 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Subjects */}
+      {/* Subjects — live from DB */}
       <section className="px-6 pb-20">
         <div className="mx-auto max-w-5xl">
           <h2 className="mb-3 text-3xl font-bold">Subjects covered</h2>
           <p className="mb-10 text-zinc-400">Content spans Class 11 &amp; 12 across boards.</p>
-          <div className="flex flex-wrap gap-3">
-            {SUBJECTS.map((s) => (
-              <Link key={s} href={`/notes?subject=${encodeURIComponent(s)}`}
-                className="rounded-full border border-zinc-700 px-5 py-2 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-300">
-                {s}
-              </Link>
-            ))}
-          </div>
+          {subjects.length === 0 ? (
+            <p className="text-sm text-zinc-500">No subjects yet — be the first to contribute!</p>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {subjects.map((s) => (
+                <Link key={s} href={`/notes?subject=${encodeURIComponent(s)}`}
+                  className="rounded-full border border-zinc-700 px-5 py-2 text-sm text-zinc-300 transition hover:border-violet-500 hover:text-violet-300">
+                  {s}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -165,7 +163,7 @@ export default function AboutPage() {
               {
                 step: "01",
                 title: "Submit",
-                desc: "Upload your PDF notes or resource file with a title, subject, and class. Author name is optional.",
+                desc: "Upload your PDF notes, resource file, or type in a CS practical with code, aim, and viva Q&A.",
               },
               {
                 step: "02",
@@ -175,7 +173,7 @@ export default function AboutPage() {
               {
                 step: "03",
                 title: "Live",
-                desc: "Approved files appear on the Notes or Resources page, searchable by subject and author.",
+                desc: "Approved content appears on the Notes, Practicals, or Resources page, searchable by subject.",
               },
             ].map((item) => (
               <div key={item.step}
@@ -197,11 +195,11 @@ export default function AboutPage() {
             <div className="relative">
               <h2 className="text-4xl font-bold">Have notes to share?</h2>
               <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-                Help other students study smarter. Upload your notes and they'll be live after a quick review.
+                Help other students study smarter. Upload your notes or submit a practical — it'll be live after a quick review.
               </p>
               <Link href="/submit"
                 className="mt-8 inline-block rounded-2xl bg-violet-600 px-8 py-3 font-medium transition hover:bg-violet-500">
-                Submit Notes
+                Submit Now
               </Link>
             </div>
           </div>

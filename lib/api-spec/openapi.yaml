@@ -142,6 +142,32 @@ paths:
               schema:
                 $ref: "#/components/schemas/Stats"
 
+  /submissions/{id}:
+    get:
+      operationId: getSubmissionById
+      tags: [submissions]
+      summary: Get a single submission by ID (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Submission found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submission:
+                    $ref: "#/components/schemas/Submission"
+                required:
+                  - submission
+        "404":
+          description: Not found
+
   /submissions/{id}/engagement:
     post:
       operationId: trackEngagement
@@ -294,6 +320,22 @@ components:
           type: ["string", "null"]
         rejectedAt:
           type: ["string", "null"]
+        practicalNo:
+          type: ["string", "null"]
+        aim:
+          type: ["string", "null"]
+        algorithm:
+          type: ["string", "null"]
+        code:
+          type: ["string", "null"]
+        expectedOutput:
+          type: ["string", "null"]
+        commonErrors:
+          type: ["string", "null"]
+        vivaQA:
+          type: ["string", "null"]
+        tags:
+          type: ["string", "null"]
       required:
         - id
         - title
@@ -323,6 +365,22 @@ components:
         author:
           type: string
         description:
+          type: string
+        practicalNo:
+          type: string
+        aim:
+          type: string
+        algorithm:
+          type: string
+        code:
+          type: string
+        expectedOutput:
+          type: string
+        commonErrors:
+          type: string
+        vivaQA:
+          type: string
+        tags:
           type: string
       required:
         - title

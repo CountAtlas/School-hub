@@ -1,19 +1,29 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
-import { practicals } from "../data/practicals";
+import { useGetApprovedSubmissions } from "@workspace/api-client-react";
+
+function parseTags(tags: string | null | undefined): string[] {
+  if (!tags) return [];
+  return tags.split(",").map((t) => t.trim()).filter(Boolean);
+}
 
 export default function PracticalsPage() {
   const [query, setQuery] = useState("");
+  const { data, isLoading } = useGetApprovedSubmissions({ section: "practicals" });
+  const practicals = data?.submissions ?? [];
 
   const filtered = useMemo(() => {
     const s = query.toLowerCase().trim();
-    return practicals.filter((p) =>
-      !s ||
-      p.title.toLowerCase().includes(s) ||
-      p.author.toLowerCase().includes(s) ||
-      p.tags.some((t) => t.toLowerCase().includes(s))
-    );
-  }, [query]);
+    if (!s) return practicals;
+    return practicals.filter((p) => {
+      const tags = parseTags(p.tags);
+      return (
+        p.title.toLowerCase().includes(s) ||
+        (p.author ?? "").toLowerCase().includes(s) ||
+        tags.some((t) => t.toLowerCase().includes(s))
+      );
+    });
+  }, [query, practicals]);
 
   return (
     <main className="min-h-screen px-6 py-10 text-white">
@@ -34,39 +44,66 @@ export default function PracticalsPage() {
           />
         </div>
 
+        {isLoading && (
+          <div className="flex justify-center py-20 text-zinc-500">Loading practicals...</div>
+        )}
+
+        {!isLoading && filtered.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+            <p className="text-lg">{query ? "No practicals match your search." : "No practicals yet."}</p>
+            {!query && (
+              <Link href="/submit" className="mt-4 text-sm text-violet-400 hover:underline">
+                Be the first to submit a practical →
+              </Link>
+            )}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((practical) => (
-            <Link key={practical.id} href={`/practicals/${practical.id}`} className="group block w-full">
-              <article className="min-h-[24rem] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-xs uppercase text-violet-400">Program {practical.practicalNo}</p>
-                    <h2 className="mt-1 text-xl font-semibold">{practical.title}</h2>
-                    <p className="mt-1 text-sm text-zinc-400">By {practical.author}</p>
+          {filtered.map((practical) => {
+            const tags = parseTags(practical.tags);
+            const codePreview = (practical.code ?? "").split("\n").slice(0, 5).join("\n");
+            return (
+              <Link key={practical.id} href={`/practicals/${practical.id}`} className="group block w-full">
+                <article className="min-h-[24rem] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      {practical.practicalNo && (
+                        <p className="text-xs uppercase text-violet-400">Program {practical.practicalNo}</p>
+                      )}
+                      <h2 className="mt-1 text-xl font-semibold">{practical.title}</h2>
+                      {practical.author && (
+                        <p className="mt-1 text-sm text-zinc-400">By {practical.author}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <pre className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/60 p-4 text-xs text-green-400">
-{practical.code.split("\n").slice(0, 5).join("\n")}
-                </pre>
+                  {codePreview && (
+                    <pre className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-black/60 p-4 text-xs text-green-400">
+                      {codePreview}
+                    </pre>
+                  )}
 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {practical.tags.map((tag) => (
-                    <span key={tag} className="rounded-full border border-zinc-700 px-2 py-1 text-[10px] text-zinc-300">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
+                  {tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {tags.map((tag) => (
+                        <span key={tag} className="rounded-full border border-zinc-700 px-2 py-1 text-[10px] text-zinc-300">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
-                <div className="mt-4 flex items-center justify-between text-xs text-zinc-500">
-                  <span>{practical.views} views</span>
-                  <span>{practical.downloads} downloads</span>
-                </div>
+                  <div className="mt-4 flex items-center justify-between text-xs text-zinc-500">
+                    <span>{practical.views ?? 0} views</span>
+                    <span>{practical.downloads ?? 0} downloads</span>
+                  </div>
 
-                <p className="mt-4 text-sm text-violet-400">Open Practical →</p>
-              </article>
-            </Link>
-          ))}
+                  <p className="mt-4 text-sm text-violet-400">Open Practical →</p>
+                </article>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </main>

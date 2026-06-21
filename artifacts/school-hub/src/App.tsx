@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import SubmitPage from "./pages/SubmitPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminSubmissionsPage from "./pages/AdminSubmissionsPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/submit" component={() => <Layout><SubmitPage /></Layout>} />
       <Route path="/admin/login" component={() => <Layout><AdminLoginPage /></Layout>} />
       <Route path="/admin/submissions" component={() => <Layout><AdminSubmissionsPage /></Layout>} />
+      <Route path="/admin/users" component={() => <Layout><AdminUsersPage /></Layout>} />
       <Route component={() => (
         <Layout>
           <main className="min-h-screen px-6 py-10 text-white">

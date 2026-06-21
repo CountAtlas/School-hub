@@ -95,8 +95,14 @@ export default function SubmitPage() {
     <main className="min-h-screen px-6 py-10 text-white">
       <div className="mx-auto max-w-2xl">
         <p className="text-sm uppercase tracking-[0.4em] text-violet-400">School Hub</p>
-        <h1 className="mt-3 text-3xl font-bold md:text-5xl">Submit Notes</h1>
-        <p className="mt-3 text-zinc-400">Upload notes, practicals, or resources. Author name is optional.</p>
+        <h1 className="mt-3 text-3xl font-bold md:text-5xl">
+          {section === "practicals" ? "Submit Practical" : section === "resources" ? "Submit Resource" : "Submit Notes"}
+        </h1>
+        <p className="mt-3 text-zinc-400">
+          {section === "practicals"
+            ? "Enter your Python practical with code, aim, algorithm, and viva Q&A."
+            : "Upload notes or resources. Author name is optional."}
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-10 space-y-5 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
           {/* Section selector — first so the form adapts */}

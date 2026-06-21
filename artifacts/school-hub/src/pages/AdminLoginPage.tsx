@@ -3,7 +3,7 @@ import { useLocation } from "wouter";
 
 export default function AdminLoginPage() {
   const [, navigate] = useLocation();
-  const [name, setName] = useState("Jeet");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -34,14 +34,14 @@ export default function AdminLoginPage() {
       <div className="mx-auto max-w-md">
         <p className="text-sm uppercase tracking-[0.4em] text-violet-400">School Hub</p>
         <h1 className="mt-3 text-5xl font-bold">Admin Login</h1>
-        <p className="mt-3 text-zinc-400">Enter the admin password to review submissions.</p>
+        <p className="mt-3 text-zinc-400">Enter your admin name and password to review submissions.</p>
 
         <form onSubmit={handleSubmit} className="mt-10 space-y-5 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
           <div>
             <label className="mb-2 block text-sm text-zinc-400">Name</label>
             <input value={name} onChange={(e) => setName(e.target.value)}
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 outline-none focus:border-violet-500"
-              placeholder="Jeet" />
+              placeholder="Admin name" />
           </div>
           <div>
             <label className="mb-2 block text-sm text-zinc-400">Password</label>

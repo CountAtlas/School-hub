@@ -2,6 +2,13 @@ import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
+export const adminsTable = pgTable("admins", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const submissionsTable = pgTable("submissions", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),

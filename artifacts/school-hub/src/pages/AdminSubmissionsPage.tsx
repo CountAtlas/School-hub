@@ -82,10 +82,16 @@ export default function AdminSubmissionsPage() {
             <h1 className="mt-3 text-5xl font-bold">Submissions</h1>
             <p className="mt-3 text-zinc-400">Review uploaded files and mark them pending, approved, or rejected.</p>
           </div>
-          <button onClick={logout}
-            className="rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-zinc-300 transition hover:border-violet-500">
-            Logout
-          </button>
+          <div className="flex gap-3">
+            <a href="/admin/users"
+              className="rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-zinc-300 transition hover:border-violet-500">
+              Manage Admins
+            </a>
+            <button onClick={logout}
+              className="rounded-2xl border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-zinc-300 transition hover:border-violet-500">
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="mb-6 grid gap-4 md:grid-cols-4">

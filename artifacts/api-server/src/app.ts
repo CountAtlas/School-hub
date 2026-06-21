@@ -6,6 +6,7 @@ import session from "express-session";
 import path from "path";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { isSupabaseConfigured } from "./lib/storage";
 
 const app: Express = express();
 
@@ -74,9 +75,9 @@ function safeStaticMiddleware(dir: string) {
   });
 }
 
-// Only serve files from disk when Supabase Storage is not configured.
-// In production (SUPABASE_URL set), files are served directly from Supabase CDN URLs.
-if (!process.env.SUPABASE_URL) {
+// Serve files from disk unless BOTH Supabase env vars are configured.
+// This keeps fallback local URLs reachable if only one var is set or an upload fails.
+if (!isSupabaseConfigured()) {
   app.use("/api/uploads", safeStaticMiddleware(UPLOAD_DIR));
   app.use("/api/uploads", safeStaticMiddleware(BACKUP_UPLOADS));
 }

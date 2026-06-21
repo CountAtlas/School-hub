@@ -6,6 +6,11 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const BUCKET = "submissions";
 
+/** True only when both required Supabase env vars are present. */
+export function isSupabaseConfigured(): boolean {
+  return Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY);
+}
+
 function getClient() {
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) return null;
   return createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);

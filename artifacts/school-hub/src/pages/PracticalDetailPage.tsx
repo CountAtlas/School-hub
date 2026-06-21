@@ -19,7 +19,7 @@ export default function PracticalDetailPage() {
     <main className="min-h-screen px-6 py-10 text-white">
       <div className="mx-auto max-w-4xl">
         <p className="text-violet-400">Program {practical.practicalNo}</p>
-        <h1 className="mt-2 text-5xl font-bold">{practical.title}</h1>
+        <h1 className="mt-2 text-3xl font-bold md:text-5xl">{practical.title}</h1>
         <p className="mt-2 text-zinc-400">By {practical.author}</p>
 
         <section className="mt-10">

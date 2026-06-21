@@ -20,7 +20,7 @@ export default function PracticalsPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-10">
           <p className="text-sm uppercase tracking-[0.4em] text-violet-400">School Hub</p>
-          <h1 className="mt-3 text-5xl font-bold">Practicals</h1>
+          <h1 className="mt-3 text-3xl font-bold md:text-5xl">Practicals</h1>
           <p className="mt-3 text-zinc-400">Python practical programs, outputs and viva questions.</p>
         </div>
 
@@ -34,10 +34,10 @@ export default function PracticalsPage() {
           />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((practical) => (
-            <Link key={practical.id} href={`/practicals/${practical.id}`} className="group block w-[320px]">
-              <article className="min-h-[24rem] overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]">
+            <Link key={practical.id} href={`/practicals/${practical.id}`} className="group block w-full">
+              <article className="min-h-[24rem] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-xs uppercase text-violet-400">Program {practical.practicalNo}</p>

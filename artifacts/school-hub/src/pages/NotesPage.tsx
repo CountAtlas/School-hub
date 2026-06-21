@@ -84,7 +84,7 @@ export default function NotesPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-10">
           <p className="text-sm uppercase tracking-[0.4em] text-violet-400">School Hub</p>
-          <h1 className="mt-3 text-5xl font-bold">Notes</h1>
+          <h1 className="mt-3 text-3xl font-bold md:text-5xl">Notes</h1>
           <p className="mt-3 text-zinc-400">Study material, revision notes, and practical PDFs in one place.</p>
         </div>
 
@@ -118,12 +118,12 @@ export default function NotesPage() {
           </div>
         )}
 
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.length > 0 ? (
             filtered.map((note) => (
               <article
                 key={note.id}
-                className="group block w-[300px] min-h-[20rem] overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]"
+                className="group block w-full min-h-[20rem] overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:border-violet-500 hover:bg-violet-500/5 hover:shadow-[0_0_30px_rgba(139,92,246,0.30)]"
               >
                 <div className="flex h-full flex-col">
                   <div className="flex items-start justify-between gap-3">

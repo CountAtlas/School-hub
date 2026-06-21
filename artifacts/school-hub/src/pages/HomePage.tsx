@@ -40,7 +40,7 @@ export default function HomePage() {
           <p className="mb-4 text-sm uppercase tracking-[0.4em] text-violet-400">
             School Hub
           </p>
-          <h1 className="max-w-4xl text-5xl font-black leading-tight md:text-6xl">
+          <h1 className="max-w-4xl text-4xl font-black leading-tight md:text-6xl">
             Knowledge should be shared,
             <span className="text-violet-400"> not hidden.</span>
           </h1>

@@ -79,7 +79,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(124,58,237,0.10),transparent_55%)]" />
         <div className="relative mx-auto max-w-5xl">
           <p className="text-sm uppercase tracking-[0.4em] text-violet-400">About School Hub</p>
-          <h1 className="mt-4 max-w-3xl text-5xl font-black leading-tight md:text-6xl">
+          <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight md:text-6xl">
             Built by students,{" "}
             <span className="bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent">
               for students.
@@ -192,7 +192,7 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="px-6 pb-24">
         <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-violet-500/5 p-10 text-center backdrop-blur-md">
+          <div className="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-violet-500/5 p-6 text-center backdrop-blur-md md:p-10">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(124,58,237,0.12),transparent_70%)]" />
             <div className="relative">
               <h2 className="text-4xl font-bold">Have notes to share?</h2>

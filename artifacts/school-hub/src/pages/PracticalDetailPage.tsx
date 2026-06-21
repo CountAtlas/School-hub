@@ -1,6 +1,24 @@
+import { useEffect } from "react";
 import { useParams } from "wouter";
 import { Link } from "wouter";
 import { useGetSubmissionById } from "@workspace/api-client-react";
+
+async function trackView(id: string): Promise<void> {
+  try {
+    const key = `views-${id}`;
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+  } catch {}
+  try {
+    await fetch(`/api/submissions/${encodeURIComponent(id)}/engagement`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ metric: "views" }),
+      credentials: "include",
+      keepalive: true,
+    });
+  } catch {}
+}
 
 function parseLines(text: string | null | undefined): string[] {
   if (!text) return [];
@@ -24,6 +42,10 @@ function parseVivaQA(vivaQA: string | null | undefined): { question: string; ans
 export default function PracticalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useGetSubmissionById(id ?? "");
+
+  useEffect(() => {
+    if (id) trackView(id);
+  }, [id]);
 
   if (isLoading) {
     return (

@@ -94,9 +94,8 @@ export default function PracticalsPage() {
                     </div>
                   )}
 
-                  <div className="mt-4 flex items-center justify-between text-xs text-zinc-500">
+                  <div className="mt-4 flex items-center text-xs text-zinc-500">
                     <span>{practical.views ?? 0} views</span>
-                    <span>{practical.downloads ?? 0} downloads</span>
                   </div>
 
                   <p className="mt-4 text-sm text-violet-400">Open Practical →</p>

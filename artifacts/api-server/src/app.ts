@@ -10,6 +10,12 @@ import { isSupabaseConfigured } from "./lib/storage";
 
 const app: Express = express();
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
+});
+
 // Trust first proxy (Railway/Render/Vercel) so secure session cookies work behind TLS termination.
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);

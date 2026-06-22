@@ -24,7 +24,7 @@ export default function PdfThumbnail({ url, className = "" }: PdfThumbnailProps)
       setErrorMsg("");
       try {
         // Pass URL directly — pdfjs-dist v3 handles HTTP range requests natively
-        loadingTask = pdfjs.getDocument({ url, withCredentials: true });
+        loadingTask = pdfjs.getDocument({ url });
         const pdf = await loadingTask.promise;
         if (cancelled) { loadingTask.destroy(); return; }
 

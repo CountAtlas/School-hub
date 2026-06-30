@@ -1,12 +1,42 @@
 @import "tailwindcss";
 
-:root {
+/* ─── Dark theme (default) ─── */
+:root,
+[data-theme="dark"] {
   --background: #09090b;
   --foreground: #fafafa;
   --card: #18181b;
+  --card-hover: #1f1f23;
   --border: #27272a;
   --accent: #7c3aed;
+  --accent-hover: #6d28d9;
   --muted: #a1a1aa;
+  --muted-foreground: #71717a;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-hover: rgba(255, 255, 255, 0.07);
+  --glow: rgba(124, 58, 237, 0.25);
+}
+
+/* ─── Light theme ─── */
+[data-theme="light"] {
+  --background: #f8f8fc;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-hover: #f4f4f8;
+  --border: #e4e4e7;
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --muted: #52525b;
+  --muted-foreground: #71717a;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --surface: rgba(0, 0, 0, 0.03);
+  --surface-hover: rgba(0, 0, 0, 0.06);
+  --glow: rgba(124, 58, 237, 0.15);
 }
 
 @theme inline {
@@ -17,8 +47,8 @@
   --color-accent: var(--accent);
   --color-muted: var(--muted);
 
-  --font-sans: 'Geist', 'Inter', Arial, Helvetica, sans-serif;
-  --font-mono: 'Geist Mono', Menlo, monospace;
+  --font-sans: 'Inter', system-ui, Arial, Helvetica, sans-serif;
+  --font-mono: 'Fira Code', 'Geist Mono', Menlo, monospace;
 }
 
 * {
@@ -30,16 +60,19 @@ html {
 }
 
 body {
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(124, 58, 237, 0.15),
-      transparent 35%
-    ),
-    #09090b;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+[data-theme="dark"] body {
+  background-image: radial-gradient(
+    circle at top,
+    rgba(124, 58, 237, 0.12),
+    transparent 35%
+  );
 }
 
 ::selection {
@@ -51,6 +84,14 @@ a {
   transition: 0.2s ease;
 }
 
-a:hover {
-  color: #a78bfa;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
 }

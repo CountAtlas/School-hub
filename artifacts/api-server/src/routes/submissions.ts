@@ -64,7 +64,14 @@ function submissionToApi(s: any) {
     subject: s.subject,
     board: s.board ?? null,
     classLevel: s.classLevel,
+    stream: s.stream ?? null,
     section: s.section,
+    resourceType: s.resourceType ?? null,
+    chapter: s.chapter ?? null,
+    teacher: s.teacher ?? null,
+    language: s.language ?? null,
+    academicYear: s.academicYear ?? null,
+    school: s.school ?? null,
     author: s.author ?? null,
     description: s.description ?? null,
     originalFileName: s.originalFileName ?? "",
@@ -100,18 +107,35 @@ router.get("/submissions", async (req, res) => {
   res.json({ submissions: rows.map(submissionToApi).reverse() });
 });
 
-// GET /api/submissions/approved — public, approved by optional section
+// GET /api/submissions/approved — public, approved by optional section + filters
 router.get("/submissions/approved", async (req, res) => {
   const section = req.query.section as string | undefined;
-  let rows;
-  if (section) {
-    rows = await db
-      .select()
-      .from(submissionsTable)
-      .where(and(eq(submissionsTable.status, "approved"), eq(submissionsTable.section, section)));
-  } else {
-    rows = await db.select().from(submissionsTable).where(eq(submissionsTable.status, "approved"));
+  const board = req.query.board as string | undefined;
+  const classLevel = req.query.classLevel as string | undefined;
+  const stream = req.query.stream as string | undefined;
+  const subject = req.query.subject as string | undefined;
+  const resourceType = req.query.resourceType as string | undefined;
+  const q = (req.query.q as string | undefined)?.toLowerCase().trim();
+
+  let rows = await db.select().from(submissionsTable).where(eq(submissionsTable.status, "approved"));
+
+  if (section) rows = rows.filter((r) => r.section === section);
+  if (board) rows = rows.filter((r) => r.board === board);
+  if (classLevel) rows = rows.filter((r) => r.classLevel === classLevel);
+  if (stream) rows = rows.filter((r) => r.stream === stream);
+  if (subject) rows = rows.filter((r) => r.subject === subject);
+  if (resourceType) rows = rows.filter((r) => r.resourceType === resourceType);
+  if (q) {
+    rows = rows.filter((r) =>
+      r.title.toLowerCase().includes(q) ||
+      r.subject.toLowerCase().includes(q) ||
+      (r.author ?? "").toLowerCase().includes(q) ||
+      (r.teacher ?? "").toLowerCase().includes(q) ||
+      (r.chapter ?? "").toLowerCase().includes(q) ||
+      (r.description ?? "").toLowerCase().includes(q)
+    );
   }
+
   res.json({ submissions: rows.map(submissionToApi) });
 });
 
@@ -155,7 +179,8 @@ router.get("/submissions/:id", async (req, res) => {
 // POST /api/submissions — public, create submission with optional file upload
 router.post("/submissions", upload.single("file"), async (req, res) => {
   const {
-    title, subject, classLevel, section, board, author, description,
+    title, subject, classLevel, section, board, stream, author, description,
+    resourceType, chapter, teacher, language, academicYear, school,
     practicalNo, aim, algorithm, code, expectedOutput, commonErrors, vivaQA, tags,
   } = req.body;
   const file = req.file;
@@ -171,9 +196,9 @@ router.post("/submissions", upload.single("file"), async (req, res) => {
     return;
   }
 
-  const allowedClassLevels = ["11", "12"];
+  const allowedClassLevels = ["9", "10", "11", "12"];
   const allowedSections = ["notes", "practicals", "resources"];
-  const allowedBoards = ["CBSE", "ISC"];
+  const allowedBoards = ["CBSE", "ICSE", "ISC", "STATE BOARD", "OTHER"];
   const normalizedBoard = (board || "CBSE").toUpperCase();
 
   if (!allowedClassLevels.includes(classLevel)) {
@@ -200,7 +225,14 @@ router.post("/submissions", upload.single("file"), async (req, res) => {
     subject: subject.trim(),
     board: normalizedBoard,
     classLevel,
+    stream: stream?.trim() || null,
     section,
+    resourceType: resourceType?.trim() || null,
+    chapter: chapter?.trim() || null,
+    teacher: teacher?.trim() || null,
+    language: language?.trim() || null,
+    academicYear: academicYear?.trim() || null,
+    school: school?.trim() || null,
     author: author?.trim() || null,
     description: description?.trim() || null,
     originalFileName: file?.originalname ?? "",

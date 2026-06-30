@@ -1,5 +1,6 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UserProfileProvider } from "./contexts/UserProfile";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import HomePage from "./pages/HomePage";
@@ -24,7 +25,7 @@ const queryClient = new QueryClient({
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--background)", color: "var(--foreground)" }}>
       <Navbar />
       <div className="flex-1">{children}</div>
       <Footer />
@@ -47,10 +48,10 @@ function Router() {
       <Route path="/admin/users" component={() => <Layout><AdminUsersPage /></Layout>} />
       <Route component={() => (
         <Layout>
-          <main className="min-h-screen px-6 py-10 text-white">
+          <main className="min-h-screen px-6 py-10" style={{ color: "var(--foreground)" }}>
             <div className="mx-auto max-w-4xl">
               <h1 className="text-5xl font-bold">404</h1>
-              <p className="mt-4 text-zinc-400">Page not found.</p>
+              <p className="mt-4" style={{ color: "var(--muted)" }}>Page not found.</p>
             </div>
           </main>
         </Layout>
@@ -62,9 +63,11 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-        <Router />
-      </WouterRouter>
+      <UserProfileProvider>
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <Router />
+        </WouterRouter>
+      </UserProfileProvider>
     </QueryClientProvider>
   );
 }

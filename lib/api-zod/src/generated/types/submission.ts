@@ -5,51 +5,43 @@
  * School Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { SubmissionSection } from './submissionSection';
+import type { SubmissionStatus } from './submissionStatus';
 
 export interface Submission {
   id: string;
   title: string;
   subject: string;
-  /** @nullable */
   board?: string | null;
   classLevel: string;
-  section: string;
-  /** @nullable */
+  stream?: string | null;
+  section: SubmissionSection;
+  resourceType?: string | null;
+  chapter?: string | null;
+  teacher?: string | null;
+  language?: string | null;
+  academicYear?: string | null;
+  school?: string | null;
   author?: string | null;
-  /** @nullable */
   description?: string | null;
-  originalFileName: string;
-  storedFileName: string;
   fileUrl: string;
-  mimeType: string;
-  status: string;
-  /** @nullable */
-  views?: number | null;
-  /** @nullable */
-  downloads?: number | null;
+  originalFileName?: string | null;
+  storedFileName?: string | null;
+  mimeType?: string | null;
+  status: SubmissionStatus;
   createdAt: string;
-  /** @nullable */
   approvedBy?: string | null;
-  /** @nullable */
   approvedAt?: string | null;
-  /** @nullable */
   rejectedBy?: string | null;
-  /** @nullable */
   rejectedAt?: string | null;
-  /** @nullable */
+  views?: number | null;
+  downloads?: number | null;
   practicalNo?: string | null;
-  /** @nullable */
   aim?: string | null;
-  /** @nullable */
   algorithm?: string | null;
-  /** @nullable */
   code?: string | null;
-  /** @nullable */
   expectedOutput?: string | null;
-  /** @nullable */
   commonErrors?: string | null;
-  /** @nullable */
   vivaQA?: string | null;
-  /** @nullable */
   tags?: string | null;
 }

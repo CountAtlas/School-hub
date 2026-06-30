@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type AdminLogout200 = {
-  ok: boolean;
-};
+export interface Admin {
+  name: string;
+  createdAt: string;
+}

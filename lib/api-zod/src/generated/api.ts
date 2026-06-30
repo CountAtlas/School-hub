@@ -27,21 +27,28 @@ export const GetSubmissionsResponse = zod.object({
   "subject": zod.string(),
   "board": zod.string().nullish(),
   "classLevel": zod.string(),
-  "section": zod.string(),
+  "stream": zod.string().nullish(),
+  "section": zod.enum(['notes', 'practicals', 'resources']),
+  "resourceType": zod.string().nullish(),
+  "chapter": zod.string().nullish(),
+  "teacher": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "academicYear": zod.string().nullish(),
+  "school": zod.string().nullish(),
   "author": zod.string().nullish(),
   "description": zod.string().nullish(),
-  "originalFileName": zod.string(),
-  "storedFileName": zod.string(),
   "fileUrl": zod.string(),
-  "mimeType": zod.string(),
-  "status": zod.string(),
-  "views": zod.number().nullish(),
-  "downloads": zod.number().nullish(),
+  "originalFileName": zod.string().nullish(),
+  "storedFileName": zod.string().nullish(),
+  "mimeType": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
   "createdAt": zod.string(),
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
   "rejectedAt": zod.string().nullish(),
+  "views": zod.number().nullish(),
+  "downloads": zod.number().nullish(),
   "practicalNo": zod.string().nullish(),
   "aim": zod.string().nullish(),
   "algorithm": zod.string().nullish(),
@@ -62,9 +69,17 @@ export const CreateSubmissionBody = zod.object({
   "subject": zod.string(),
   "board": zod.string().optional(),
   "classLevel": zod.string(),
-  "section": zod.string(),
+  "stream": zod.string().optional(),
+  "section": zod.enum(['notes', 'practicals', 'resources']),
+  "resourceType": zod.string().optional(),
+  "chapter": zod.string().optional(),
+  "teacher": zod.string().optional(),
+  "language": zod.string().optional(),
+  "academicYear": zod.string().optional(),
+  "school": zod.string().optional(),
   "author": zod.string().optional(),
   "description": zod.string().optional(),
+  "file": zod.instanceof(File).optional(),
   "practicalNo": zod.string().optional(),
   "aim": zod.string().optional(),
   "algorithm": zod.string().optional(),
@@ -83,21 +98,28 @@ export const CreateSubmissionResponse = zod.object({
   "subject": zod.string(),
   "board": zod.string().nullish(),
   "classLevel": zod.string(),
-  "section": zod.string(),
+  "stream": zod.string().nullish(),
+  "section": zod.enum(['notes', 'practicals', 'resources']),
+  "resourceType": zod.string().nullish(),
+  "chapter": zod.string().nullish(),
+  "teacher": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "academicYear": zod.string().nullish(),
+  "school": zod.string().nullish(),
   "author": zod.string().nullish(),
   "description": zod.string().nullish(),
-  "originalFileName": zod.string(),
-  "storedFileName": zod.string(),
   "fileUrl": zod.string(),
-  "mimeType": zod.string(),
-  "status": zod.string(),
-  "views": zod.number().nullish(),
-  "downloads": zod.number().nullish(),
+  "originalFileName": zod.string().nullish(),
+  "storedFileName": zod.string().nullish(),
+  "mimeType": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
   "createdAt": zod.string(),
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
   "rejectedAt": zod.string().nullish(),
+  "views": zod.number().nullish(),
+  "downloads": zod.number().nullish(),
   "practicalNo": zod.string().nullish(),
   "aim": zod.string().nullish(),
   "algorithm": zod.string().nullish(),
@@ -115,7 +137,7 @@ export const CreateSubmissionResponse = zod.object({
  */
 export const UpdateSubmissionStatusBody = zod.object({
   "id": zod.string(),
-  "status": zod.string()
+  "status": zod.enum(['pending', 'approved', 'rejected'])
 })
 
 export const UpdateSubmissionStatusResponse = zod.object({
@@ -126,21 +148,28 @@ export const UpdateSubmissionStatusResponse = zod.object({
   "subject": zod.string(),
   "board": zod.string().nullish(),
   "classLevel": zod.string(),
-  "section": zod.string(),
+  "stream": zod.string().nullish(),
+  "section": zod.enum(['notes', 'practicals', 'resources']),
+  "resourceType": zod.string().nullish(),
+  "chapter": zod.string().nullish(),
+  "teacher": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "academicYear": zod.string().nullish(),
+  "school": zod.string().nullish(),
   "author": zod.string().nullish(),
   "description": zod.string().nullish(),
-  "originalFileName": zod.string(),
-  "storedFileName": zod.string(),
   "fileUrl": zod.string(),
-  "mimeType": zod.string(),
-  "status": zod.string(),
-  "views": zod.number().nullish(),
-  "downloads": zod.number().nullish(),
+  "originalFileName": zod.string().nullish(),
+  "storedFileName": zod.string().nullish(),
+  "mimeType": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
   "createdAt": zod.string(),
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
   "rejectedAt": zod.string().nullish(),
+  "views": zod.number().nullish(),
+  "downloads": zod.number().nullish(),
   "practicalNo": zod.string().nullish(),
   "aim": zod.string().nullish(),
   "algorithm": zod.string().nullish(),
@@ -157,7 +186,13 @@ export const UpdateSubmissionStatusResponse = zod.object({
  * @summary Get approved submissions by section
  */
 export const GetApprovedSubmissionsQueryParams = zod.object({
-  "section": zod.enum(['notes', 'practicals', 'resources']).optional()
+  "section": zod.enum(['notes', 'practicals', 'resources']).optional(),
+  "board": zod.coerce.string().optional(),
+  "classLevel": zod.coerce.string().optional(),
+  "stream": zod.coerce.string().optional(),
+  "subject": zod.coerce.string().optional(),
+  "resourceType": zod.coerce.string().optional(),
+  "q": zod.coerce.string().optional()
 })
 
 export const GetApprovedSubmissionsResponse = zod.object({
@@ -167,21 +202,28 @@ export const GetApprovedSubmissionsResponse = zod.object({
   "subject": zod.string(),
   "board": zod.string().nullish(),
   "classLevel": zod.string(),
-  "section": zod.string(),
+  "stream": zod.string().nullish(),
+  "section": zod.enum(['notes', 'practicals', 'resources']),
+  "resourceType": zod.string().nullish(),
+  "chapter": zod.string().nullish(),
+  "teacher": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "academicYear": zod.string().nullish(),
+  "school": zod.string().nullish(),
   "author": zod.string().nullish(),
   "description": zod.string().nullish(),
-  "originalFileName": zod.string(),
-  "storedFileName": zod.string(),
   "fileUrl": zod.string(),
-  "mimeType": zod.string(),
-  "status": zod.string(),
-  "views": zod.number().nullish(),
-  "downloads": zod.number().nullish(),
+  "originalFileName": zod.string().nullish(),
+  "storedFileName": zod.string().nullish(),
+  "mimeType": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
   "createdAt": zod.string(),
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
   "rejectedAt": zod.string().nullish(),
+  "views": zod.number().nullish(),
+  "downloads": zod.number().nullish(),
   "practicalNo": zod.string().nullish(),
   "aim": zod.string().nullish(),
   "algorithm": zod.string().nullish(),
@@ -209,7 +251,7 @@ export const GetStatsResponse = zod.object({
 
 
 /**
- * @summary Get a single submission by ID (public)
+ * @summary Get a single submission by ID
  */
 export const GetSubmissionByIdParams = zod.object({
   "id": zod.coerce.string()
@@ -222,21 +264,28 @@ export const GetSubmissionByIdResponse = zod.object({
   "subject": zod.string(),
   "board": zod.string().nullish(),
   "classLevel": zod.string(),
-  "section": zod.string(),
+  "stream": zod.string().nullish(),
+  "section": zod.enum(['notes', 'practicals', 'resources']),
+  "resourceType": zod.string().nullish(),
+  "chapter": zod.string().nullish(),
+  "teacher": zod.string().nullish(),
+  "language": zod.string().nullish(),
+  "academicYear": zod.string().nullish(),
+  "school": zod.string().nullish(),
   "author": zod.string().nullish(),
   "description": zod.string().nullish(),
-  "originalFileName": zod.string(),
-  "storedFileName": zod.string(),
   "fileUrl": zod.string(),
-  "mimeType": zod.string(),
-  "status": zod.string(),
-  "views": zod.number().nullish(),
-  "downloads": zod.number().nullish(),
+  "originalFileName": zod.string().nullish(),
+  "storedFileName": zod.string().nullish(),
+  "mimeType": zod.string().nullish(),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
   "createdAt": zod.string(),
   "approvedBy": zod.string().nullish(),
   "approvedAt": zod.string().nullish(),
   "rejectedBy": zod.string().nullish(),
   "rejectedAt": zod.string().nullish(),
+  "views": zod.number().nullish(),
+  "downloads": zod.number().nullish(),
   "practicalNo": zod.string().nullish(),
   "aim": zod.string().nullish(),
   "algorithm": zod.string().nullish(),
@@ -250,7 +299,7 @@ export const GetSubmissionByIdResponse = zod.object({
 
 
 /**
- * @summary Track view or download
+ * @summary Track view or download engagement
  */
 export const TrackEngagementParams = zod.object({
   "id": zod.coerce.string()
@@ -258,10 +307,6 @@ export const TrackEngagementParams = zod.object({
 
 export const TrackEngagementBody = zod.object({
   "metric": zod.enum(['views', 'downloads'])
-})
-
-export const TrackEngagementResponse = zod.object({
-  "ok": zod.boolean()
 })
 
 
@@ -273,26 +318,234 @@ export const AdminLoginBody = zod.object({
   "password": zod.string()
 })
 
-export const AdminLoginResponse = zod.object({
+
+/**
+ * @summary List admin accounts
+ */
+export const GetAdminsResponse = zod.object({
+  "admins": zod.array(zod.object({
+  "name": zod.string(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Create admin account
+ */
+export const CreateAdminBody = zod.object({
+  "name": zod.string().optional(),
+  "password": zod.string()
+})
+
+
+/**
+ * @summary Delete admin account
+ */
+export const DeleteAdminBody = zod.object({
+  "name": zod.string()
+})
+
+
+/**
+ * @summary Get daily class updates
+ */
+export const GetDailyUpdatesQueryParams = zod.object({
+  "date": zod.coerce.string().optional().describe('Filter by date (YYYY-MM-DD). Defaults to today.'),
+  "subject": zod.coerce.string().optional(),
+  "classLevel": zod.coerce.string().optional(),
+  "board": zod.coerce.string().optional()
+})
+
+export const GetDailyUpdatesResponse = zod.object({
+  "updates": zod.array(zod.object({
+  "id": zod.string(),
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "subject": zod.string(),
+  "teacher": zod.string().nullish(),
+  "classLevel": zod.string().nullish(),
+  "board": zod.string().nullish(),
+  "portionCovered": zod.string().nullish(),
+  "homework": zod.string().nullish(),
+  "practicalWork": zod.string().nullish(),
+  "announcement": zod.string().nullish(),
+  "postedBy": zod.string(),
+  "verifications": zod.array(zod.string()),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Post a daily class update
+ */
+export const CreateDailyUpdateBody = zod.object({
+  "date": zod.string().optional().describe('YYYY-MM-DD, defaults to today'),
+  "subject": zod.string(),
+  "teacher": zod.string().optional(),
+  "classLevel": zod.string().optional(),
+  "board": zod.string().optional(),
+  "portionCovered": zod.string().optional(),
+  "homework": zod.string().optional(),
+  "practicalWork": zod.string().optional(),
+  "announcement": zod.string().optional(),
+  "postedBy": zod.string()
+})
+
+export const CreateDailyUpdateResponse = zod.object({
   "ok": zod.boolean(),
-  "name": zod.string().optional()
+  "update": zod.object({
+  "id": zod.string(),
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "subject": zod.string(),
+  "teacher": zod.string().nullish(),
+  "classLevel": zod.string().nullish(),
+  "board": zod.string().nullish(),
+  "portionCovered": zod.string().nullish(),
+  "homework": zod.string().nullish(),
+  "practicalWork": zod.string().nullish(),
+  "announcement": zod.string().nullish(),
+  "postedBy": zod.string(),
+  "verifications": zod.array(zod.string()),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).optional()
 })
 
 
 /**
- * @summary Admin logout
+ * @summary Verify a daily update
  */
-export const AdminLogoutResponse = zod.object({
-  "ok": zod.boolean()
+export const VerifyDailyUpdateParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const VerifyDailyUpdateBody = zod.object({
+  "studentName": zod.string()
+})
+
+export const VerifyDailyUpdateResponse = zod.object({
+  "ok": zod.boolean(),
+  "update": zod.object({
+  "id": zod.string(),
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "subject": zod.string(),
+  "teacher": zod.string().nullish(),
+  "classLevel": zod.string().nullish(),
+  "board": zod.string().nullish(),
+  "portionCovered": zod.string().nullish(),
+  "homework": zod.string().nullish(),
+  "practicalWork": zod.string().nullish(),
+  "announcement": zod.string().nullish(),
+  "postedBy": zod.string(),
+  "verifications": zod.array(zod.string()),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).optional()
 })
 
 
 /**
- * @summary Get current admin session info
+ * @summary Get upcoming exams
  */
-export const AdminMeResponse = zod.object({
-  "authenticated": zod.boolean(),
-  "name": zod.string().nullable()
+export const GetExamsQueryParams = zod.object({
+  "classLevel": zod.coerce.string().optional(),
+  "board": zod.coerce.string().optional(),
+  "subject": zod.coerce.string().optional()
+})
+
+export const GetExamsResponse = zod.object({
+  "exams": zod.array(zod.object({
+  "id": zod.string(),
+  "subject": zod.string(),
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "portion": zod.string().nullish(),
+  "board": zod.string().nullish(),
+  "classLevel": zod.string().nullish(),
+  "stream": zod.string().nullish(),
+  "postedBy": zod.string(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Post an upcoming exam
+ */
+export const CreateExamBody = zod.object({
+  "subject": zod.string(),
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "portion": zod.string().optional(),
+  "board": zod.string().optional(),
+  "classLevel": zod.string().optional(),
+  "stream": zod.string().optional(),
+  "postedBy": zod.string()
+})
+
+export const CreateExamResponse = zod.object({
+  "ok": zod.boolean(),
+  "exam": zod.object({
+  "id": zod.string(),
+  "subject": zod.string(),
+  "date": zod.string().describe('YYYY-MM-DD'),
+  "portion": zod.string().nullish(),
+  "board": zod.string().nullish(),
+  "classLevel": zod.string().nullish(),
+  "stream": zod.string().nullish(),
+  "postedBy": zod.string(),
+  "createdAt": zod.string()
+}).optional()
+})
+
+
+/**
+ * @summary Delete an exam
+ */
+export const DeleteExamBody = zod.object({
+  "id": zod.string()
+})
+
+
+/**
+ * @summary Get announcements
+ */
+export const GetAnnouncementsQueryParams = zod.object({
+  "limit": zod.coerce.number().optional()
+})
+
+export const GetAnnouncementsResponse = zod.object({
+  "announcements": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "type": zod.enum(['holiday', 'schedule-change', 'practical-reminder', 'event', 'other']),
+  "postedBy": zod.string(),
+  "createdAt": zod.string()
+}))
+})
+
+
+/**
+ * @summary Post an announcement
+ */
+export const CreateAnnouncementBody = zod.object({
+  "title": zod.string(),
+  "content": zod.string(),
+  "type": zod.enum(['holiday', 'schedule-change', 'practical-reminder', 'event', 'other']),
+  "postedBy": zod.string()
+})
+
+export const CreateAnnouncementResponse = zod.object({
+  "ok": zod.boolean(),
+  "announcement": zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "content": zod.string(),
+  "type": zod.enum(['holiday', 'schedule-change', 'practical-reminder', 'event', 'other']),
+  "postedBy": zod.string(),
+  "createdAt": zod.string()
+}).optional()
 })
 
 

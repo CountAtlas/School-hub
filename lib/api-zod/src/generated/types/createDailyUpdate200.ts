@@ -5,9 +5,9 @@
  * School Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { DailyUpdate } from './dailyUpdate';
 
-export type AdminMe200 = {
-  authenticated: boolean;
-  /** @nullable */
-  name: string | null;
+export type CreateDailyUpdate200 = {
+  ok: boolean;
+  update?: DailyUpdate;
 };

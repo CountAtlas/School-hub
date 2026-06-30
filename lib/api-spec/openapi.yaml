@@ -13,6 +13,12 @@ tags:
     description: Submission operations
   - name: admin
     description: Admin operations
+  - name: daily-updates
+    description: Daily class update operations
+  - name: exams
+    description: Exam operations
+  - name: announcements
+    description: Announcement operations
 paths:
   /healthz:
     get:
@@ -114,6 +120,36 @@ paths:
           schema:
             type: string
             enum: [notes, practicals, resources]
+        - name: board
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: classLevel
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: stream
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subject
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: resourceType
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: Approved submissions
@@ -146,7 +182,7 @@ paths:
     get:
       operationId: getSubmissionById
       tags: [submissions]
-      summary: Get a single submission by ID (public)
+      summary: Get a single submission by ID
       parameters:
         - name: id
           in: path
@@ -155,7 +191,7 @@ paths:
             type: string
       responses:
         "200":
-          description: Submission found
+          description: Submission
           content:
             application/json:
               schema:
@@ -172,7 +208,7 @@ paths:
     post:
       operationId: trackEngagement
       tags: [submissions]
-      summary: Track view or download
+      summary: Track view or download engagement
       parameters:
         - name: id
           in: path
@@ -187,18 +223,7 @@ paths:
               $ref: "#/components/schemas/EngagementInput"
       responses:
         "200":
-          description: Updated
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                required:
-                  - ok
-        "404":
-          description: Not found
+          description: Engagement tracked
 
   /admin/login:
     post:
@@ -214,19 +239,8 @@ paths:
       responses:
         "200":
           description: Logged in
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                  name:
-                    type: string
-                required:
-                  - ok
         "401":
-          description: Unauthorized
+          description: Invalid credentials
 
   /admin/logout:
     post:
@@ -236,6 +250,118 @@ paths:
       responses:
         "200":
           description: Logged out
+
+  /admin/users:
+    get:
+      operationId: getAdmins
+      tags: [admin]
+      summary: List admin accounts
+      responses:
+        "200":
+          description: Admins list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admins:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Admin"
+                required:
+                  - admins
+        "401":
+          description: Unauthorized
+    post:
+      operationId: createAdmin
+      tags: [admin]
+      summary: Create admin account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginInput"
+      responses:
+        "200":
+          description: Admin created
+        "401":
+          description: Unauthorized
+    delete:
+      operationId: deleteAdmin
+      tags: [admin]
+      summary: Delete admin account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        "200":
+          description: Admin deleted
+        "401":
+          description: Unauthorized
+
+  /daily-updates:
+    get:
+      operationId: getDailyUpdates
+      tags: [daily-updates]
+      summary: Get daily class updates
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by date (YYYY-MM-DD). Defaults to today.
+        - name: subject
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: classLevel
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: board
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Daily updates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  updates:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DailyUpdate"
+                required:
+                  - updates
+    post:
+      operationId: createDailyUpdate
+      tags: [daily-updates]
+      summary: Post a daily class update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DailyUpdateInput"
+      responses:
+        "200":
+          description: Update created
           content:
             application/json:
               schema:
@@ -243,29 +369,179 @@ paths:
                 properties:
                   ok:
                     type: boolean
+                  update:
+                    $ref: "#/components/schemas/DailyUpdate"
                 required:
                   - ok
+        "400":
+          description: Bad request
 
-  /admin/me:
-    get:
-      operationId: adminMe
-      tags: [admin]
-      summary: Get current admin session info
+  /daily-updates/{id}/verify:
+    post:
+      operationId: verifyDailyUpdate
+      tags: [daily-updates]
+      summary: Verify a daily update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                studentName:
+                  type: string
+              required:
+                - studentName
       responses:
         "200":
-          description: Authenticated
+          description: Verified
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  authenticated:
+                  ok:
                     type: boolean
-                  name:
-                    type: ["string", "null"]
+                  update:
+                    $ref: "#/components/schemas/DailyUpdate"
                 required:
-                  - authenticated
-                  - name
+                  - ok
+        "400":
+          description: Already verified or invalid
+
+  /exams:
+    get:
+      operationId: getExams
+      tags: [exams]
+      summary: Get upcoming exams
+      parameters:
+        - name: classLevel
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: board
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: subject
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Exams list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exams:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Exam"
+                required:
+                  - exams
+    post:
+      operationId: createExam
+      tags: [exams]
+      summary: Post an upcoming exam
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamInput"
+      responses:
+        "200":
+          description: Exam created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  exam:
+                    $ref: "#/components/schemas/Exam"
+                required:
+                  - ok
+    delete:
+      operationId: deleteExam
+      tags: [exams]
+      summary: Delete an exam
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+              required:
+                - id
+      responses:
+        "200":
+          description: Deleted
+
+  /announcements:
+    get:
+      operationId: getAnnouncements
+      tags: [announcements]
+      summary: Get announcements
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Announcements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  announcements:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Announcement"
+                required:
+                  - announcements
+    post:
+      operationId: createAnnouncement
+      tags: [announcements]
+      summary: Post an announcement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementInput"
+      responses:
+        "200":
+          description: Announcement created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  announcement:
+                    $ref: "#/components/schemas/Announcement"
+                required:
+                  - ok
 
 components:
   schemas:
@@ -287,65 +563,106 @@ components:
         subject:
           type: string
         board:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         classLevel:
           type: string
+        stream:
+          type: string
+          nullable: true
         section:
           type: string
+          enum: [notes, practicals, resources]
+        resourceType:
+          type: string
+          nullable: true
+        chapter:
+          type: string
+          nullable: true
+        teacher:
+          type: string
+          nullable: true
+        language:
+          type: string
+          nullable: true
+        academicYear:
+          type: string
+          nullable: true
+        school:
+          type: string
+          nullable: true
         author:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         description:
-          type: ["string", "null"]
-        originalFileName:
           type: string
-        storedFileName:
-          type: string
+          nullable: true
         fileUrl:
           type: string
+        originalFileName:
+          type: string
+          nullable: true
+        storedFileName:
+          type: string
+          nullable: true
         mimeType:
           type: string
+          nullable: true
         status:
           type: string
-        views:
-          type: ["integer", "null"]
-        downloads:
-          type: ["integer", "null"]
+          enum: [pending, approved, rejected]
         createdAt:
           type: string
         approvedBy:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         approvedAt:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         rejectedBy:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         rejectedAt:
-          type: ["string", "null"]
+          type: string
+          nullable: true
+        views:
+          type: integer
+          nullable: true
+        downloads:
+          type: integer
+          nullable: true
+        # Practical-specific
         practicalNo:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         aim:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         algorithm:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         code:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         expectedOutput:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         commonErrors:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         vivaQA:
-          type: ["string", "null"]
+          type: string
+          nullable: true
         tags:
-          type: ["string", "null"]
+          type: string
+          nullable: true
       required:
         - id
         - title
         - subject
         - classLevel
         - section
-        - originalFileName
-        - storedFileName
         - fileUrl
-        - mimeType
         - status
         - createdAt
 
@@ -360,12 +677,30 @@ components:
           type: string
         classLevel:
           type: string
+        stream:
+          type: string
         section:
+          type: string
+          enum: [notes, practicals, resources]
+        resourceType:
+          type: string
+        chapter:
+          type: string
+        teacher:
+          type: string
+        language:
+          type: string
+        academicYear:
+          type: string
+        school:
           type: string
         author:
           type: string
         description:
           type: string
+        file:
+          type: string
+          format: binary
         practicalNo:
           type: string
         aim:
@@ -395,6 +730,7 @@ components:
           type: string
         status:
           type: string
+          enum: [pending, approved, rejected]
       required:
         - id
         - status
@@ -417,6 +753,17 @@ components:
           type: string
       required:
         - password
+
+    Admin:
+      type: object
+      properties:
+        name:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - name
+        - createdAt
 
     Stats:
       type: object
@@ -443,3 +790,179 @@ components:
         - resourcesCount
         - contributors
         - subjectsCount
+
+    DailyUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          description: YYYY-MM-DD
+        subject:
+          type: string
+        teacher:
+          type: string
+          nullable: true
+        classLevel:
+          type: string
+          nullable: true
+        board:
+          type: string
+          nullable: true
+        portionCovered:
+          type: string
+          nullable: true
+        homework:
+          type: string
+          nullable: true
+        practicalWork:
+          type: string
+          nullable: true
+        announcement:
+          type: string
+          nullable: true
+        postedBy:
+          type: string
+        verifications:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - date
+        - subject
+        - postedBy
+        - verifications
+        - createdAt
+        - updatedAt
+
+    DailyUpdateInput:
+      type: object
+      properties:
+        date:
+          type: string
+          description: YYYY-MM-DD, defaults to today
+        subject:
+          type: string
+        teacher:
+          type: string
+        classLevel:
+          type: string
+        board:
+          type: string
+        portionCovered:
+          type: string
+        homework:
+          type: string
+        practicalWork:
+          type: string
+        announcement:
+          type: string
+        postedBy:
+          type: string
+      required:
+        - subject
+        - postedBy
+
+    Exam:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        date:
+          type: string
+          description: YYYY-MM-DD
+        portion:
+          type: string
+          nullable: true
+        board:
+          type: string
+          nullable: true
+        classLevel:
+          type: string
+          nullable: true
+        stream:
+          type: string
+          nullable: true
+        postedBy:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - subject
+        - date
+        - postedBy
+        - createdAt
+
+    ExamInput:
+      type: object
+      properties:
+        subject:
+          type: string
+        date:
+          type: string
+          description: YYYY-MM-DD
+        portion:
+          type: string
+        board:
+          type: string
+        classLevel:
+          type: string
+        stream:
+          type: string
+        postedBy:
+          type: string
+      required:
+        - subject
+        - date
+        - postedBy
+
+    Announcement:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [holiday, schedule-change, practical-reminder, event, other]
+        postedBy:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - content
+        - type
+        - postedBy
+        - createdAt
+
+    AnnouncementInput:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          type: string
+          enum: [holiday, schedule-change, practical-reminder, event, other]
+        postedBy:
+          type: string
+      required:
+        - title
+        - content
+        - type
+        - postedBy

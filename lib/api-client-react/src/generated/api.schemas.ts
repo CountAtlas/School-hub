@@ -9,62 +9,87 @@ export interface HealthStatus {
   status: string;
 }
 
+export type SubmissionSection = typeof SubmissionSection[keyof typeof SubmissionSection];
+
+
+export const SubmissionSection = {
+  notes: 'notes',
+  practicals: 'practicals',
+  resources: 'resources',
+} as const;
+
+export type SubmissionStatus = typeof SubmissionStatus[keyof typeof SubmissionStatus];
+
+
+export const SubmissionStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
 export interface Submission {
   id: string;
   title: string;
   subject: string;
-  /** @nullable */
   board?: string | null;
   classLevel: string;
-  section: string;
-  /** @nullable */
+  stream?: string | null;
+  section: SubmissionSection;
+  resourceType?: string | null;
+  chapter?: string | null;
+  teacher?: string | null;
+  language?: string | null;
+  academicYear?: string | null;
+  school?: string | null;
   author?: string | null;
-  /** @nullable */
   description?: string | null;
-  originalFileName: string;
-  storedFileName: string;
   fileUrl: string;
-  mimeType: string;
-  status: string;
-  /** @nullable */
-  views?: number | null;
-  /** @nullable */
-  downloads?: number | null;
+  originalFileName?: string | null;
+  storedFileName?: string | null;
+  mimeType?: string | null;
+  status: SubmissionStatus;
   createdAt: string;
-  /** @nullable */
   approvedBy?: string | null;
-  /** @nullable */
   approvedAt?: string | null;
-  /** @nullable */
   rejectedBy?: string | null;
-  /** @nullable */
   rejectedAt?: string | null;
-  /** @nullable */
+  views?: number | null;
+  downloads?: number | null;
   practicalNo?: string | null;
-  /** @nullable */
   aim?: string | null;
-  /** @nullable */
   algorithm?: string | null;
-  /** @nullable */
   code?: string | null;
-  /** @nullable */
   expectedOutput?: string | null;
-  /** @nullable */
   commonErrors?: string | null;
-  /** @nullable */
   vivaQA?: string | null;
-  /** @nullable */
   tags?: string | null;
 }
+
+export type SubmissionInputSection = typeof SubmissionInputSection[keyof typeof SubmissionInputSection];
+
+
+export const SubmissionInputSection = {
+  notes: 'notes',
+  practicals: 'practicals',
+  resources: 'resources',
+} as const;
 
 export interface SubmissionInput {
   title: string;
   subject: string;
   board?: string;
   classLevel: string;
-  section: string;
+  stream?: string;
+  section: SubmissionInputSection;
+  resourceType?: string;
+  chapter?: string;
+  teacher?: string;
+  language?: string;
+  academicYear?: string;
+  school?: string;
   author?: string;
   description?: string;
+  file?: Blob;
   practicalNo?: string;
   aim?: string;
   algorithm?: string;
@@ -75,9 +100,18 @@ export interface SubmissionInput {
   tags?: string;
 }
 
+export type SubmissionStatusUpdateStatus = typeof SubmissionStatusUpdateStatus[keyof typeof SubmissionStatusUpdateStatus];
+
+
+export const SubmissionStatusUpdateStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
 export interface SubmissionStatusUpdate {
   id: string;
-  status: string;
+  status: SubmissionStatusUpdateStatus;
 }
 
 export type EngagementInputMetric = typeof EngagementInputMetric[keyof typeof EngagementInputMetric];
@@ -97,6 +131,11 @@ export interface AdminLoginInput {
   password: string;
 }
 
+export interface Admin {
+  name: string;
+  createdAt: string;
+}
+
 export interface Stats {
   approvedCount: number;
   pendingCount: number;
@@ -105,6 +144,100 @@ export interface Stats {
   resourcesCount: number;
   contributors: number;
   subjectsCount: number;
+}
+
+export interface DailyUpdate {
+  id: string;
+  /** YYYY-MM-DD */
+  date: string;
+  subject: string;
+  teacher?: string | null;
+  classLevel?: string | null;
+  board?: string | null;
+  portionCovered?: string | null;
+  homework?: string | null;
+  practicalWork?: string | null;
+  announcement?: string | null;
+  postedBy: string;
+  verifications: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DailyUpdateInput {
+  /** YYYY-MM-DD, defaults to today */
+  date?: string;
+  subject: string;
+  teacher?: string;
+  classLevel?: string;
+  board?: string;
+  portionCovered?: string;
+  homework?: string;
+  practicalWork?: string;
+  announcement?: string;
+  postedBy: string;
+}
+
+export interface Exam {
+  id: string;
+  subject: string;
+  /** YYYY-MM-DD */
+  date: string;
+  portion?: string | null;
+  board?: string | null;
+  classLevel?: string | null;
+  stream?: string | null;
+  postedBy: string;
+  createdAt: string;
+}
+
+export interface ExamInput {
+  subject: string;
+  /** YYYY-MM-DD */
+  date: string;
+  portion?: string;
+  board?: string;
+  classLevel?: string;
+  stream?: string;
+  postedBy: string;
+}
+
+export type AnnouncementType = typeof AnnouncementType[keyof typeof AnnouncementType];
+
+
+export const AnnouncementType = {
+  holiday: 'holiday',
+  'schedule-change': 'schedule-change',
+  'practical-reminder': 'practical-reminder',
+  event: 'event',
+  other: 'other',
+} as const;
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  type: AnnouncementType;
+  postedBy: string;
+  createdAt: string;
+}
+
+export type AnnouncementInputType = typeof AnnouncementInputType[keyof typeof AnnouncementInputType];
+
+
+export const AnnouncementInputType = {
+  holiday: 'holiday',
+  'schedule-change': 'schedule-change',
+  'practical-reminder': 'practical-reminder',
+  event: 'event',
+  other: 'other',
+} as const;
+
+export interface AnnouncementInput {
+  title: string;
+  content: string;
+  type: AnnouncementInputType;
+  postedBy: string;
 }
 
 export type GetSubmissions200 = {
@@ -123,6 +256,12 @@ export type UpdateSubmissionStatus200 = {
 
 export type GetApprovedSubmissionsParams = {
 section?: GetApprovedSubmissionsSection;
+board?: string;
+classLevel?: string;
+stream?: string;
+subject?: string;
+resourceType?: string;
+q?: string;
 };
 
 export type GetApprovedSubmissionsSection = typeof GetApprovedSubmissionsSection[keyof typeof GetApprovedSubmissionsSection];
@@ -142,22 +281,71 @@ export type GetSubmissionById200 = {
   submission: Submission;
 };
 
-export type TrackEngagement200 = {
-  ok: boolean;
+export type GetAdmins200 = {
+  admins: Admin[];
 };
 
-export type AdminLogin200 = {
-  ok: boolean;
-  name?: string;
+export type DeleteAdminBody = {
+  name: string;
 };
 
-export type AdminLogout200 = {
-  ok: boolean;
+export type GetDailyUpdatesParams = {
+/**
+ * Filter by date (YYYY-MM-DD). Defaults to today.
+ */
+date?: string;
+subject?: string;
+classLevel?: string;
+board?: string;
 };
 
-export type AdminMe200 = {
-  authenticated: boolean;
-  /** @nullable */
-  name: string | null;
+export type GetDailyUpdates200 = {
+  updates: DailyUpdate[];
+};
+
+export type CreateDailyUpdate200 = {
+  ok: boolean;
+  update?: DailyUpdate;
+};
+
+export type VerifyDailyUpdateBody = {
+  studentName: string;
+};
+
+export type VerifyDailyUpdate200 = {
+  ok: boolean;
+  update?: DailyUpdate;
+};
+
+export type GetExamsParams = {
+classLevel?: string;
+board?: string;
+subject?: string;
+};
+
+export type GetExams200 = {
+  exams: Exam[];
+};
+
+export type CreateExam200 = {
+  ok: boolean;
+  exam?: Exam;
+};
+
+export type DeleteExamBody = {
+  id: string;
+};
+
+export type GetAnnouncementsParams = {
+limit?: number;
+};
+
+export type GetAnnouncements200 = {
+  announcements: Announcement[];
+};
+
+export type CreateAnnouncement200 = {
+  ok: boolean;
+  announcement?: Announcement;
 };
 

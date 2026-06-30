@@ -5,8 +5,8 @@
  * School Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { Admin } from './admin';
 
-export type AdminLogin200 = {
-  ok: boolean;
-  name?: string;
+export type GetAdmins200 = {
+  admins: Admin[];
 };

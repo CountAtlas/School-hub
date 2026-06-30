@@ -15,7 +15,14 @@ export const submissionsTable = pgTable("submissions", {
   subject: text("subject").notNull(),
   board: text("board"),
   classLevel: text("class_level").notNull(),
+  stream: text("stream"),
   section: text("section").notNull(),
+  resourceType: text("resource_type"),
+  chapter: text("chapter"),
+  teacher: text("teacher"),
+  language: text("language"),
+  academicYear: text("academic_year"),
+  school: text("school"),
   author: text("author"),
   description: text("description"),
   originalFileName: text("original_file_name").notNull().default(""),
@@ -39,6 +46,44 @@ export const submissionsTable = pgTable("submissions", {
   commonErrors: text("common_errors"),
   vivaQA: text("viva_qa"),
   tags: text("tags"),
+});
+
+export const dailyUpdatesTable = pgTable("daily_updates", {
+  id: text("id").primaryKey(),
+  date: text("date").notNull(), // YYYY-MM-DD
+  subject: text("subject").notNull(),
+  teacher: text("teacher"),
+  classLevel: text("class_level"),
+  board: text("board"),
+  portionCovered: text("portion_covered"),
+  homework: text("homework"),
+  practicalWork: text("practical_work"),
+  announcement: text("announcement"),
+  postedBy: text("posted_by").notNull(),
+  verifications: text("verifications").notNull().default("[]"), // JSON array of student names
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const examsTable = pgTable("exams", {
+  id: text("id").primaryKey(),
+  subject: text("subject").notNull(),
+  date: text("date").notNull(), // YYYY-MM-DD
+  portion: text("portion"),
+  board: text("board"),
+  classLevel: text("class_level"),
+  stream: text("stream"),
+  postedBy: text("posted_by").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const announcementsTable = pgTable("announcements", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  type: text("type").notNull().default("other"), // holiday | schedule-change | practical-reminder | event | other
+  postedBy: text("posted_by").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const insertSubmissionSchema = createInsertSchema(submissionsTable).omit({

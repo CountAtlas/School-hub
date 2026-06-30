@@ -5,15 +5,24 @@
  * School Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { SubmissionInputSection } from './submissionInputSection';
 
 export interface SubmissionInput {
   title: string;
   subject: string;
   board?: string;
   classLevel: string;
-  section: string;
+  stream?: string;
+  section: SubmissionInputSection;
+  resourceType?: string;
+  chapter?: string;
+  teacher?: string;
+  language?: string;
+  academicYear?: string;
+  school?: string;
   author?: string;
   description?: string;
+  file?: Blob;
   practicalNo?: string;
   aim?: string;
   algorithm?: string;

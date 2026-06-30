@@ -9,4 +9,10 @@ import type { GetApprovedSubmissionsSection } from './getApprovedSubmissionsSect
 
 export type GetApprovedSubmissionsParams = {
 section?: GetApprovedSubmissionsSection;
+board?: string;
+classLevel?: string;
+stream?: string;
+subject?: string;
+resourceType?: string;
+q?: string;
 };

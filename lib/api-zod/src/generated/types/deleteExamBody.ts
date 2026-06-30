@@ -6,6 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type TrackEngagement200 = {
-  ok: boolean;
+export type DeleteExamBody = {
+  id: string;
 };

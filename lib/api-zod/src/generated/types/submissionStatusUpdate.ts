@@ -5,8 +5,9 @@
  * School Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { SubmissionStatusUpdateStatus } from './submissionStatusUpdateStatus';
 
 export interface SubmissionStatusUpdate {
   id: string;
-  status: string;
+  status: SubmissionStatusUpdateStatus;
 }
